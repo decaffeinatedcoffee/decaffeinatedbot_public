@@ -2248,9 +2248,11 @@ app.get('/profile', async ({ query }, res) => {
 			
 		} catch (error) {
 			console.error(error);
-      return res.sendFile(__dirname + '/public/index.html');
-		}
-	}
+      res.render('index', {totalguilds: client.guilds.cache.size});
+      	}
+	}else{
+        res.send('<script>location.replace("/")</script>')
+       }
 	
 });
 
