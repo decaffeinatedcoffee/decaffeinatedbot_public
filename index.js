@@ -141,12 +141,11 @@ client.on("ready", (client) =>{
                           |/                          
   `);
 	keepBotAlive();
-  console.log("O bot foi iniciado com sucesso")
-  console.log("Verificando latencia...")
+  console.log("The bot was started successfully!")
+  console.log("Checking the API latency...")
   function pingboot() {
-    console.log("Latencia da api: " + client.ws.ping + "ms");
-    console.log("estou em " + client.guilds.cache.size + " servidores");
- console.log("Tudo certo!");
+    console.log("API latency: " + client.ws.ping + "ms");
+    console.log("Im in " + client.guilds.cache.size + " servers");
   console.log("[" + ('0' + dia).slice(-2) + "/" + ('0' + mes).slice(-2) + "/" + ('0' + anos).slice(-2) + " " + ('0' + horas).slice(-2) + ":" + ('0' + minutos).slice(-2) + ":" + ('0' + segundos).slice(-2) + "]");
  }
 setTimeout(pingboot, 3000);
@@ -2141,8 +2140,9 @@ let mutedrole = guild.roles.cache.find(m => m.name === "Muted");
 
 
 client.login(process.env.DISCORDTOKEN)
+
 server.listen(process.env.PORT || 5000, () => {
-  console.log("Listening Ports 5000 and " + process.env.PORT)
+  console.log("The web server is now listening ports 5000 and " + process.env.PORT)
 })
 
 
