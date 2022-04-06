@@ -2143,10 +2143,50 @@ client.on("guildCreate", (guild) => {
 
 });
 
+////////////////////////////////logger lines/////////////////////////////
+
+
+client.on('messageDelete', function(msg, channel){
+
+  let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+    const embeddelete = new Discord.MessageEmbed()
+    .setColor("#00FFFF")
+    .setTitle('Message deleted in ' + msg.channel.name + " channel")
+    .setAuthor("By " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+    .addFields(
+      { name: 'Content:', value: msg.content },
+    )
+    .setTimestamp()
+    if(c && msg.content){
+    c.send({ embeds: [embeddelete] })
+    }
+  });
+
+
+  client.on('messageUpdate', function(msg, newmsg){
+
+    let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+      const embeddelete = new Discord.MessageEmbed()
+      .setColor("#00FFFF")
+      .setTitle('Message edited in ' + msg.channel.name + " channel")
+      .setAuthor("By " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+      .addFields(
+        { name: 'Old content:', value: msg.content },
+        { name: 'New content:', value: newmsg.content },
+      )
+      .setTimestamp()
+      if(c && msg.content){
+      c.send({ embeds: [embeddelete] })
+      }
+    });
+
+/////////////////////////////////////////////////////////////////////////
 
 
 
-client.login(process.env.DISCORDTOKEN)
+client.login(process.env.DISCORDTOKEN);
+
+
 server.listen(process.env.PORT || 5000, () => {
   console.log("Listening Ports 5000 and " + process.env.PORT)
 })
