@@ -323,7 +323,23 @@ client.on("messageCreate", (msg) => {
                   else {
                     (async () => {
                       await keyv.set(msg.guild.id + userset + 'xp', amount[1])
+                      var nomexp = "<@" + userset + ">";
                       msg.reply('✅ The user XP was edited successfully!');
+                      let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+                      const embedxp = new Discord.MessageEmbed()
+                        .setColor('#0099ff')
+                        .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+                        .setThumbnail("https://cdn.discordapp.com/avatars/" + userset.id + "/" + userset.user.avatar + ".png")
+                        .setTitle('Edited user:')
+                        .addFields(
+                          { name: 'Nickname', value: nomexp },
+                          { name: 'Amount', value: amount[1].toString() },
+                        )
+                        .setTimestamp()
+                        .setFooter('The user XP was edited successfully!');
+                      if(c){
+                      c.send({ embeds: [embedxp] });
+                      }
                     })();
                   }
                 }
@@ -342,7 +358,25 @@ client.on("messageCreate", (msg) => {
               var user = msg.mentions.members.first();
               (async () => {
                 await keyv.set(msg.guild.id + user + 'xp', 0);
+                var nomexp = "<@" + user + ">";
                 msg.reply('✅ The user XP was reseted successfully!');
+                let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+                const embedxp = new Discord.MessageEmbed()
+                  .setColor('#0099ff')
+                  .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+                  .setThumbnail("https://cdn.discordapp.com/avatars/" + user.id + "/" + user.user.avatar + ".png")
+                  .setTitle('Reseted user:')
+                  .addFields(
+                    { name: 'Nickname', value: nomexp },
+                  )
+                  .setTimestamp()
+                  .setFooter('The user XP was reseted successfully!');
+                if(c){
+                c.send({ embeds: [embedxp] });
+                }
+
+
+
               })();
             } else {
               msg.reply("❌ You can't use this command!");
@@ -427,6 +461,21 @@ client.on("messageCreate", (msg) => {
                   else {
                     await keyv.set(serverusado, impostosempercent);
                     msg.reply("The server tax was setted as " + porcentagem + " successfully!")
+                    let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+                    const embedxp = new Discord.MessageEmbed()
+                      .setColor('#0099ff')
+                      .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+                      .setThumbnail(msg.guild.iconURL())
+                      .setTitle('The server taxes value was changed')
+                      .addFields(
+                        { name: 'Taxes value', value: impostosempercent + "%"},
+                      )
+                      .setTimestamp()
+                      .setFooter('The user XP was reseted successfully!');
+                    if(c){
+                    c.send({ embeds: [embedxp] });
+                    }
+    
                   }
                 }
               })();
@@ -987,6 +1036,7 @@ client.on("messageCreate", (msg) => {
                       var gifkick = Math.floor(Math.random() * 3);
                       try {
                         await membrokick.kick(motivo)
+                        let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
                         const embedkick = new Discord.MessageEmbed()
                           .setColor('#0099ff')
                           .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
@@ -998,7 +1048,9 @@ client.on("messageCreate", (msg) => {
                           )
                           .setTimestamp()
                           .setFooter('User kicked successsfully!');
-                        msg.channel.send({ embeds: [embedkick] });
+                          if(c){
+                        c.send({ embeds: [embedkick] });
+                          }
                         msg.reply("The user was kicked successfully! " + chutesgif[gifkick])
 
                       }
@@ -1045,6 +1097,7 @@ client.on("messageCreate", (msg) => {
                           membroban.ban({
                             reason: motivo,
                           })
+                          let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
                           const embedban = new Discord.MessageEmbed()
                             .setColor('#0099ff')
                             .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
@@ -1056,8 +1109,9 @@ client.on("messageCreate", (msg) => {
                             )
                             .setTimestamp()
                             .setFooter('The user was banned successfully!');
-
-                          msg.channel.send({ embeds: [embedban] });
+                          if(c){
+                          c.send({ embeds: [embedban] });
+                          }
                           msg.reply("The user was banned successfully! " + martelosgif[gifban])
 
                         }
@@ -1103,6 +1157,7 @@ client.on("messageCreate", (msg) => {
                       try {
                         var role = membromute.guild.roles.cache.find(role => role.name === "Muted");
                         membromute.roles.add(role);
+                        let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
                         const embedmute = new Discord.MessageEmbed()
                           .setColor('#0099ff')
                           .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
@@ -1114,8 +1169,13 @@ client.on("messageCreate", (msg) => {
                           )
                           .setTimestamp()
                           .setFooter('The user was muted successfully!');
-
-                        msg.channel.send({ embeds: [embedmute] });
+                        if(c){
+                        c.send({ embeds: [embedmute] });
+                        }
+                        membromute.send({ content: `You were warned on the ${msg.guild.name} server!`, embeds: [embedwarn], })
+                        .catch(err => {
+                          console.error(`Error while sending a DM mute.`);
+                        });
                         msg.reply("The user was muted successfully! ")
                         msg.channel.send("https://media.discordapp.net/attachments/273509180747415555/920146895245025280/Shut.png");
 
@@ -1162,6 +1222,7 @@ client.on("messageCreate", (msg) => {
                         try {
                           var role = membromute.guild.roles.cache.find(role => role.name === "Muted");
                           membromute.roles.remove(role);
+                          let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
                           const embedmute = new Discord.MessageEmbed()
                             .setColor('#0099ff')
                             .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
@@ -1173,8 +1234,13 @@ client.on("messageCreate", (msg) => {
                             )
                             .setTimestamp()
                             .setFooter('The user was unmuted successfully!');
-
-                          msg.channel.send({ embeds: [embedmute] });
+                          if(c){
+                          c.send({ embeds: [embedmute] });
+                          }
+                          membromute.send({ content: `You were warned on the ${msg.guild.name} server!`, embeds: [embedwarn], })
+                        .catch(err => {
+                          console.error(`Error while sending a DM unmute.`);
+                        });
                           msg.reply("The user was unmuted successfully! ")
                           msg.channel.send("https://media.discordapp.net/attachments/273509180747415555/920146895026946088/Unshut.png");
 
@@ -1234,6 +1300,7 @@ client.on("messageCreate", (msg) => {
                       let thiswarn = { cause: motivo, mod: msg.author.username.replace(/[&\/\\#,+`$~%'":;*<>{}]/g, ''), guild: msg.guild.name.replace(/[&\/\\#,+`$~%'":;*<>{}]/g, ''), time: warntime }
                       await keyv.set(membrowarn + "warns", parseInt(warnsnow) + 1);
                       await keyv.set(membrowarn + "warns" + totalwarns, JSON.stringify(thiswarn));
+                      let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
                       const embedwarn = new Discord.MessageEmbed()
                         .setColor('#0099ff')
                         .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
@@ -1245,7 +1312,9 @@ client.on("messageCreate", (msg) => {
                         )
                         .setTimestamp()
                         .setFooter('The user were warned successfully!');
-
+                     if(c){
+                       c.send({embeds: [embedwarn], })
+                     }
                       membrowarn.send({ content: `You were warned on the ${msg.guild.name} server!`, embeds: [embedwarn], })
                         .catch(err => {
                           console.error(`Error while sending a DM warn.`);
@@ -2139,6 +2208,17 @@ client.on("guildCreate", (guild) => {
         console.log(error);
       }
     }
+
+    try{
+      guild.channels.create('bot-logs', {
+        type: 'GUILD_TEXT',
+      }).then(function channel(chan){
+        chan.send("This channel was generated by decaffeinatedbot, here all the moderation logs will be displayed.")
+      })
+      }
+    catch{
+     console.log("error");
+    }
   })();
 
 });
@@ -2149,6 +2229,8 @@ client.on("guildCreate", (guild) => {
 client.on('messageDelete', function(msg, channel){
 
   let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+  if(c && msg.content){
+    try{
     const embeddelete = new Discord.MessageEmbed()
     .setColor("#00FFFF")
     .setTitle('Message deleted in ' + msg.channel.name + " channel")
@@ -2157,15 +2239,20 @@ client.on('messageDelete', function(msg, channel){
       { name: 'Content:', value: msg.content },
     )
     .setTimestamp()
-    if(c && msg.content){
     c.send({ embeds: [embeddelete] })
     }
+  catch{
+    console.log("error")
+  }
+}
   });
 
 
   client.on('messageUpdate', function(msg, newmsg){
 
     let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+    if(c && msg.content){
+      try{
       const embeddelete = new Discord.MessageEmbed()
       .setColor("#00FFFF")
       .setTitle('Message edited in ' + msg.channel.name + " channel")
@@ -2175,9 +2262,11 @@ client.on('messageDelete', function(msg, channel){
         { name: 'New content:', value: newmsg.content },
       )
       .setTimestamp()
-      if(c && msg.content){
       c.send({ embeds: [embeddelete] })
+      }catch{
+        console.log("error")
       }
+    }
     });
 
 /////////////////////////////////////////////////////////////////////////
