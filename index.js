@@ -1172,7 +1172,7 @@ client.on("messageCreate", (msg) => {
                         if(c){
                         c.send({ embeds: [embedmute] });
                         }
-                        membromute.send({ content: `You were warned on the ${msg.guild.name} server!`, embeds: [embedwarn], })
+                        membromute.send({ content: `You were warned on the ${msg.guild.name} server!`, embeds: [embedmute], })
                         .catch(err => {
                           console.error(`Error while sending a DM mute.`);
                         });
@@ -1237,7 +1237,7 @@ client.on("messageCreate", (msg) => {
                           if(c){
                           c.send({ embeds: [embedmute] });
                           }
-                          membromute.send({ content: `You were warned on the ${msg.guild.name} server!`, embeds: [embedwarn], })
+                          membromute.send({ content: `You were warned on the ${msg.guild.name} server!`, embeds: [embedmute], })
                         .catch(err => {
                           console.error(`Error while sending a DM unmute.`);
                         });
