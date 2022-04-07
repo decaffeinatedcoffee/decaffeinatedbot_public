@@ -1779,7 +1779,7 @@ if (msg.content.toLocaleLowerCase().startsWith("!timeout")) {
             const embedhelp = new Discord.MessageEmbed()
               .setColor("#d3db39")
               .setTitle('!HELP')
-              .setDescription("Hi " + msg.author.username + ", here are all the commands:")
+              .setDescription("Hi " + msg.author.username + ", here are almost all the commands:")
               .addFields(
                 { name: '!createaccount', value: "Creates a account on the bot bank" },
                 { name: '!money', value: "Show the user account balance" },
