@@ -1269,6 +1269,79 @@ client.on("messageCreate", (msg) => {
 
 
 
+if (msg.content.toLocaleLowerCase().startsWith("!timeout")) {
+            (async () => {
+              var timeoutmember = msg.mentions.members.first();
+              if (timeoutmember == msg.author.id || timeoutmember == process.env.BOTID) {
+                msg.reply("Oof, you can not timeout yourself or me!")
+              }
+              else {
+                const msgArr = msg.content.split(' ');
+                const arg = msgArr.slice(2).filter(val => val !== '')
+                var totaltime = arg.join(' ')
+                var timeoutname = "<@" + timeoutmember + ">";
+                if (!totaltime || isNaN(totaltime)) {
+                  totaltime = 5;
+                } else {
+                  totaltime = totaltime.replace(/[&\/\\#,+`$~%'":;*<>{}]/g, '');
+                }
+                if (msg.member.permissions.has(["MANAGE_ROLES", "BAN_MEMBERS"])) {
+                  if (timeoutmember == undefined) {
+                    msg.reply("Please ping a valid user")
+                  }
+                  else {
+                    try {
+                      totaltime = parseInt(totaltime)
+                      timeoutmember.timeout(totaltime * 60 * 1000)
+                      let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+                      const embedtimeout = new Discord.MessageEmbed()
+                        .setColor('#0099ff')
+                        .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+                        .setThumbnail("https://cdn.discordapp.com/avatars/" + timeoutmember.id + "/" + timeoutmember.user.avatar + ".png")
+                        .setTitle('Punished user:')
+                        .addFields(
+                          { name: 'Nickname', value: timeoutname },
+                          { name: 'Time', value: totaltime.toString() + " mins"},
+                        )
+                        .setTimestamp()
+                        .setFooter('The user received a timeout successfully!');
+                     if(c){
+                       c.send({embeds: [embedtimeout], })
+                     }
+                      timeoutmember.send({ content: `You received a timeout on the ${msg.guild.name} server!`, embeds: [embedtimeout], })
+                        .catch(err => {
+                          console.error(`Error while sending a DM timeout.`);
+                        });
+
+                      msg.reply("The user <@" + timeoutmember.id + "> was received a " + totaltime + " mins timeout successfully! ")
+                      msg.channel.send("https://c.tenor.com/Tp6pUkz1oR8AAAAM/breaks-keyboard.gif");
+
+                    }
+
+                    catch {
+                      msg.reply("I cant timeout this user, probably their role is higher than mine, sorry );");
+                    }
+                  }
+                }
+                else {
+                  msg.reply("You need the to be a mod to use this!")
+                }
+
+              }
+            })();
+
+
+          }
+
+
+
+
+
+
+
+
+
+
           if (msg.content.toLocaleLowerCase().startsWith("!warn")) {
             (async () => {
               var membrowarn = msg.mentions.members.first();
@@ -1732,10 +1805,11 @@ client.on("messageCreate", (msg) => {
                 { name: '!setrule [rule]', value: "Add a new rule to the rules channel" },
                 { name: '!giverole [@user] [@role]', value: "Gives a role to an user" },
                 { name: '!takerole [@user] [@role]', value: "Removes a role from an user" },
-                { name: '!kick [@user] [cause]', value: "Kick a user" },
-                { name: '!ban [@user] [cause]', value: "Ban a user" },
-                { name: '!mute [@user] [cause]', value: "mute a user" },
-                { name: '!warn [@user] [cause]', value: "Warn a user" },
+                { name: '!kick [@user] [cause]', value: "Kick an user" },
+                { name: '!ban [@user] [cause]', value: "Ban an user" },
+                { name: '!mute [@user] [cause]', value: "mute an user" },
+                { name: '!warn [@user] [cause]', value: "Warn an user" },
+                { name: '!timeout [@user] [time in minutes]', value: "Timeouts an user" },
               )
               .setFooter("I hope I helped you 💜")
               .setTimestamp()
