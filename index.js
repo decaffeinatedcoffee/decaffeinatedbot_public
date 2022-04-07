@@ -1798,7 +1798,6 @@ if (msg.content.toLocaleLowerCase().startsWith("!timeout")) {
                 { name: '!random animal', value: "Generates a random animal" },
                 { name: '!random name', value: "Generates a random first name" },
                 { name: '!botclock', value: "Shows the bot system current time" },
-                { name: 'MODS OR OWNER ONLY', value: "Staff commands list:" },
                 { name: '!taxes [value%]', value: "Set the server taxes" },
                 { name: '!serverbank', value: "Show the server account balance" },
                 { name: '!ruleschannel [channel ID]', value: "Set the server rules channel" },
@@ -1809,15 +1808,15 @@ if (msg.content.toLocaleLowerCase().startsWith("!timeout")) {
                 { name: '!ban [@user] [cause]', value: "Ban an user" },
                 { name: '!mute [@user] [cause]', value: "mute an user" },
                 { name: '!warn [@user] [cause]', value: "Warn an user" },
-                { name: '!timeout [@user] [time in minutes]', value: "Timeouts an user" },
+                { name: '!timeout [@user] [time in minutes]', value: "Timeouts an user" }
               )
               .setFooter("I hope I helped you 💜")
               .setTimestamp()
             msg.react('✅');
             setTimeout(() => msg.delete(), 2500);
-            msg.author.send({ embeds: [embedhelp] })
+            msg.author.send({content:"You can see all the commands in https://decaffeinatedbot.herokuapp.com/commands", embeds: [embedhelp] })
               .catch(err => {
-                msg.channel.send({ embeds: [embedhelp] });
+                msg.channel.send({content:"You can see all the commands in https://decaffeinatedbot.herokuapp.com/commands", embeds: [embedhelp] });
               });
 
           }
