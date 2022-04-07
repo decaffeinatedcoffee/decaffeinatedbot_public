@@ -1313,7 +1313,7 @@ if (msg.content.toLocaleLowerCase().startsWith("!timeout")) {
                           console.error(`Error while sending a DM timeout.`);
                         });
 
-                      msg.reply("The user <@" + timeoutmember.id + "> was received a " + totaltime + " mins timeout successfully! ")
+                      msg.reply("The user <@" + timeoutmember.id + "> received a " + totaltime + " mins timeout successfully! ")
                       msg.channel.send("https://c.tenor.com/Tp6pUkz1oR8AAAAM/breaks-keyboard.gif");
 
                     }
