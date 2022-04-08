@@ -1935,12 +1935,11 @@ if (msg.content.toLocaleLowerCase().startsWith("!timeout")) {
           if (msg.content.toLowerCase().startsWith("$eval")) {
             (async () => {
               if (msg.author.id == process.env.OWNERID) {
-                try {
                   var result = msg.content.split(" ").slice(1).join(" ");
-                  let evaled = await eval(result);
-                } catch {
-                  msg.reply("❌ Error!");
-                }
+                  let evaled = await eval(result)
+                .catch(function(err){
+                  msg.reply("❌ Error! ```" + err + "```");
+                })
               } else {
                 msg.reply("❌ only the bot owner can use this!");
                 console.log(msg.author.tag + " on " + msg.guild.name + " tried to use eval command!");
