@@ -73,7 +73,18 @@ flex-direction: row;
 justify-content: center;
 align-items: center;
     }
-
+#repdiv{
+    position: absolute;
+    bottom: 10px;
+    width:99%;
+}
+#rep{
+    text-align: center;
+cursor: pointer;
+}
+#rep:hover{
+    color: rgb(168, 168, 168);
+}
 </style>
 <body> 
     <div id="homepage">
@@ -95,6 +106,12 @@ align-items: center;
 <button id="invite" onclick=" window.open('https://discord.com/api/oauth2/authorize?client_id=911314631526592544&permissions=8&scope=bot', '_blank').focus();">Invite me!</button>
 
 </div>
+
+<div id="repdiv">
+<p id="rep" onclick="window.open('https://github.com/decaffeinatedcoffee/decaffeinatedbot_public', '_blank').focus();">Go to decaffeinatedbot GitHub repository</p>
+</div>
+
+
 </body>
 
 </html>
