@@ -31,7 +31,7 @@ const keyv = new Keyv(process.env.MONGODB);
 const dailySet = new Set();
 const trabalhoSet = new Set();
 const roubarSet = new Set();
-const clearSet = new Set(); 
+const clearSet = new Set();
 const bdaymessage = new Set();
 const xpSet = new Set();
 keyv.on('error', err => console.error('Keyv connection error:', err));
@@ -337,8 +337,8 @@ client.on("messageCreate", (msg) => {
                         )
                         .setTimestamp()
                         .setFooter('The user XP was edited successfully!');
-                      if(c){
-                      c.send({ embeds: [embedxp] });
+                      if (c) {
+                        c.send({ embeds: [embedxp] });
                       }
                     })();
                   }
@@ -371,8 +371,8 @@ client.on("messageCreate", (msg) => {
                   )
                   .setTimestamp()
                   .setFooter('The user XP was reseted successfully!');
-                if(c){
-                c.send({ embeds: [embedxp] });
+                if (c) {
+                  c.send({ embeds: [embedxp] });
                 }
 
 
@@ -468,14 +468,14 @@ client.on("messageCreate", (msg) => {
                       .setThumbnail(msg.guild.iconURL())
                       .setTitle('The server taxes value was changed')
                       .addFields(
-                        { name: 'Taxes value', value: impostosempercent + "%"},
+                        { name: 'Taxes value', value: impostosempercent + "%" },
                       )
                       .setTimestamp()
                       .setFooter('The user XP was reseted successfully!');
-                    if(c){
-                    c.send({ embeds: [embedxp] });
+                    if (c) {
+                      c.send({ embeds: [embedxp] });
                     }
-    
+
                   }
                 }
               })();
@@ -1016,6 +1016,11 @@ client.on("messageCreate", (msg) => {
           if (msg.content.toLocaleLowerCase().startsWith("!kick")) {
             (async () => {
               var membrokick = msg.mentions.members.first();
+              let attachment;
+              let attachments = msg.attachments.first();
+              if (attachments) {
+                attachment = attachments.url
+              }
               if (membrokick == msg.author.id) {
                 msg.reply("Oof, you can not kick yourself!")
               }
@@ -1025,39 +1030,37 @@ client.on("messageCreate", (msg) => {
                 const motivo = arg.join(' ')
                 var nomekick = "<@" + membrokick + ">";
                 if (msg.member.permissions.has(["MANAGE_ROLES", "BAN_MEMBERS"])) {
-                  if (motivo == "") {
-                    msg.reply("Please set the kick cause")
+                  if (!motivo) {
+                    motivo = "No cause setted"
                   }
                   else {
                     if (membrokick == undefined) {
                       msg.reply("Please ping a valid user!")
                     }
-                    else {
-                      var gifkick = Math.floor(Math.random() * 3);
-                        await membrokick.kick(motivo).then(function(){
-                        let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-                        const embedkick = new Discord.MessageEmbed()
-                          .setColor('#0099ff')
-                          .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
-                          .setThumbnail("https://cdn.discordapp.com/avatars/" + membrokick.id + "/" + membrokick.user.avatar + ".png")
-                          .setTitle('Punished user:')
-                          .addFields(
-                            { name: 'Nickname', value: nomekick },
-                            { name: 'Cause', value: motivo },
-                          )
-                          .setTimestamp()
-                          .setFooter('User kicked successsfully!');
-                          if(c){
-                        c.send({ embeds: [embedkick] });
-                          }
-                        msg.reply("The user was kicked successfully! " + chutesgif[gifkick])
+                    var gifkick = Math.floor(Math.random() * 3);
+                    membrokick.kick(motivo).then(function () {
+                      let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+                      const embedkick = new Discord.MessageEmbed()
+                        .setColor('#0099ff')
+                        .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+                        .setThumbnail("https://cdn.discordapp.com/avatars/" + membrokick.id + "/" + membrokick.user.avatar + ".png")
+                        .setTitle('Punished user:')
+                        .addFields(
+                          { name: 'Nickname', value: nomekick },
+                          { name: 'Cause', value: motivo },
+                        )
+                        .setTimestamp()
+                        .setFooter('User kicked successsfully!');
+                      if (c) {
+                        c.send({ content: "Proofs: " + attachment, embeds: [embedkick], })
+                      }
+                      msg.reply("The user was kicked successfully! " + chutesgif[gifkick])
 
-                      })
+                    })
 
-                      .catch(function(err){
+                      .catch(function (err) {
                         msg.reply("I cant kick this user, probably their role is higher than mine, sorry );");
                       })
-                    }
                   }
                 }
                 else {
@@ -1074,6 +1077,11 @@ client.on("messageCreate", (msg) => {
             if (msg.content != '!bank') {
               (async () => {
                 var membroban = msg.mentions.members.first();
+                let attachment;
+                let attachments = msg.attachments.first();
+                if (attachments) {
+                  attachment = attachments.url
+                }
                 if (membroban == msg.author.id) {
                   msg.reply("Oof, you can not ban yourself!")
                 }
@@ -1082,50 +1090,52 @@ client.on("messageCreate", (msg) => {
                   const arg = msgArr.slice(2).filter(val => val !== '')
                   const motivo = arg.join(' ')
                   var nomeban = "<@" + membroban + ">";
-                  if (motivo == "") {
-                    msg.reply("Please set a cause!")
+                  if (!motivo) {
+                    motivo = "No cause setted"
                   }
-                  else {
-                    if (msg.member.permissions.has(["MANAGE_ROLES", "BAN_MEMBERS"])) {
-                      if (membroban == undefined) {
-                        msg.reply("Please ping a valid user")
-                      }
-                      else {
-                        var gifban = Math.floor(Math.random() * 5);
-                          membroban.ban({
-                            reason: motivo,
-                          }).then(function(){
-                          let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-                          const embedban = new Discord.MessageEmbed()
-                            .setColor('#0099ff')
-                            .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
-                            .setThumbnail("https://cdn.discordapp.com/avatars/" + membroban.id + "/" + membroban.user.avatar + ".png")
-                            .setTitle('Punished user:')
-                            .addFields(
-                              { name: 'Nickname', value: nomeban },
-                              { name: 'Cause', value: motivo },
-                            )
-                            .setTimestamp()
-                            .setFooter('The user was banned successfully!');
-                          if(c){
-                          c.send({ embeds: [embedban] });
-                          }
-                          msg.reply("The user was banned successfully! " + martelosgif[gifban])
-
-                        })
-
-                       .catch(function(err){
-                          msg.reply("I cant ban this user, probably their role is higher than mine, sorry );");
-                        })
-                      }
-
+                  if (msg.member.permissions.has(["MANAGE_ROLES", "BAN_MEMBERS"])) {
+                    if (membroban == undefined) {
+                      msg.reply("Please ping a valid user")
                     }
                     else {
-                      msg.reply("You need the to be a mod to use this!")
+                      var gifban = Math.floor(Math.random() * 5);
+                      membroban.ban({
+                        reason: motivo,
+                      }).then(function () {
+                        let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+                        const embedban = new Discord.MessageEmbed()
+                          .setColor('#0099ff')
+                          .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+                          .setThumbnail("https://cdn.discordapp.com/avatars/" + membroban.id + "/" + membroban.user.avatar + ".png")
+                          .setTitle('Punished user:')
+                          .addFields(
+                            { name: 'Nickname', value: nomeban },
+                            { name: 'Cause', value: motivo },
+                          )
+                          .setTimestamp()
+                          .setFooter('The user was banned successfully!');
+                        if (!attachment) {
+                          attachment = "No attached proofs"
+                        }
+                        if (c) {
+                          c.send({ content: "Proofs: " + attachment, embeds: [embedban], })
+                        }
+                        msg.reply("The user was banned successfully! " + martelosgif[gifban])
+
+                      })
+
+                        .catch(function (err) {
+                          msg.reply("I cant ban this user, probably their role is higher than mine, sorry );");
+                        })
                     }
 
                   }
+                  else {
+                    msg.reply("You need the to be a mod to use this!")
+                  }
+
                 }
+
               })();
             }
           }
@@ -1135,6 +1145,11 @@ client.on("messageCreate", (msg) => {
           if (msg.content.toLocaleLowerCase().startsWith("!mute")) {
             (async () => {
               var membromute = msg.mentions.members.first();
+              let attachment;
+              let attachments = msg.attachments.first();
+              if (attachments) {
+                attachment = attachments.url
+              }
               if (membromute == msg.author.id) {
                 msg.reply("Oof, you can not mute yourself!")
               }
@@ -1143,53 +1158,55 @@ client.on("messageCreate", (msg) => {
                 const arg = msgArr.slice(2).filter(val => val !== '')
                 const motivo = arg.join(' ')
                 var nomemute = "<@" + membromute + ">";
-                if (motivo == "") {
-                  msg.reply("Please set a cause!")
+                if (!motivo) {
+                  motivo = "No cause setted"
                 }
-                else {
-                  if (msg.member.permissions.has(["MANAGE_ROLES", "BAN_MEMBERS"])) {
-                    if (membromute == undefined) {
-                      msg.reply("Please ping a valid user")
-                    }
-                    else {
-                        var role = membromute.guild.roles.cache.find(role => role.name === "Muted");
-                        membromute.roles.add(role).then(function(){
-                        let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-                        const embedmute = new Discord.MessageEmbed()
-                          .setColor('#0099ff')
-                          .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
-                          .setThumbnail("https://cdn.discordapp.com/avatars/" + membromute.id + "/" + membromute.user.avatar + ".png")
-                          .setTitle('Punished user:')
-                          .addFields(
-                            { name: 'Nickname', value: nomemute },
-                            { name: 'Cause', value: motivo },
-                          )
-                          .setTimestamp()
-                          .setFooter('The user was muted successfully!');
-                        if(c){
-                        c.send({ embeds: [embedmute] });
-                        }
-                        membromute.send({ content: `You were warned on the ${msg.guild.name} server!`, embeds: [embedmute], })
+                if (msg.member.permissions.has(["MANAGE_ROLES", "BAN_MEMBERS"])) {
+                  if (membromute == undefined) {
+                    msg.reply("Please ping a valid user")
+                  }
+                  else {
+                    var role = membromute.guild.roles.cache.find(role => role.name === "Muted");
+                    membromute.roles.add(role).then(function () {
+                      let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+                      const embedmute = new Discord.MessageEmbed()
+                        .setColor('#0099ff')
+                        .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+                        .setThumbnail("https://cdn.discordapp.com/avatars/" + membromute.id + "/" + membromute.user.avatar + ".png")
+                        .setTitle('Punished user:')
+                        .addFields(
+                          { name: 'Nickname', value: nomemute },
+                          { name: 'Cause', value: motivo },
+                        )
+                        .setTimestamp()
+                        .setFooter('The user was muted successfully!');
+                      if (!attachment) {
+                        attachment = "No attached proofs"
+                      }
+                      if (c) {
+                        c.send({ content: "Proofs: " + attachment, embeds: [embedmute], })
+                      }
+                      membromute.send({ content: `You were muted on the ${msg.guild.name} server! proofs: ` + attachment, embeds: [embedmute], })
                         .catch(err => {
                           console.error(`Error while sending a DM mute.`);
                         });
-                        msg.reply("The user was muted successfully! ")
-                        msg.channel.send("https://media.discordapp.net/attachments/273509180747415555/920146895245025280/Shut.png");
+                      msg.reply("The user was muted successfully! ")
+                      msg.channel.send("https://media.discordapp.net/attachments/273509180747415555/920146895245025280/Shut.png");
 
-                      })
+                    })
 
-                      .catch(function(err){
+                      .catch(function (err) {
                         msg.reply("I cant mute this user, probably their role is higher than mine, sorry );");
                       })
-                    }
-
-                  }
-                  else {
-                    msg.reply("You need the to be a mod to use this!")
                   }
 
                 }
+                else {
+                  msg.reply("You need the to be a mod to use this!")
+                }
+
               }
+
             })();
 
 
@@ -1206,55 +1223,53 @@ client.on("messageCreate", (msg) => {
                 const arg = msgArr.slice(2).filter(val => val !== '')
                 const motivo = arg.join(' ')
                 var nomemute = "<@" + membromute + ">";
-                if (motivo == "") {
-                  msg.reply("Please set a cause!")
+                if (!motivo) {
+                  motivo = "No cause setted"
                 }
-                else {
-                  if (msg.member.permissions.has(["MANAGE_ROLES", "BAN_MEMBERS"])) {
-                    if (membromute == undefined) {
-                      msg.reply("Please ping a valid user")
-                    }
-                    else {
-                      if (membromute.roles.cache.some(role => role.name === 'Muted')) {
-                          var role = membromute.guild.roles.cache.find(role => role.name === "Muted");
-                          membromute.roles.remove(role).then(function(){
-                          let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-                          const embedmute = new Discord.MessageEmbed()
-                            .setColor('#0099ff')
-                            .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
-                            .setThumbnail("https://cdn.discordapp.com/avatars/" + membromute.id + "/" + membromute.user.avatar + ".png")
-                            .setTitle('Unpunished user:')
-                            .addFields(
-                              { name: 'Nickname', value: nomemute },
-                              { name: 'Cause', value: motivo },
-                            )
-                            .setTimestamp()
-                            .setFooter('The user was unmuted successfully!');
-                          if(c){
-                          c.send({ embeds: [embedmute] });
-                          }
-                          membromute.send({ content: `You were warned on the ${msg.guild.name} server!`, embeds: [embedmute], })
-                        .catch(err => {
-                          console.error(`Error while sending a DM unmute.`);
-                        });
-                          msg.reply("The user was unmuted successfully! ")
-                          msg.channel.send("https://media.discordapp.net/attachments/273509180747415555/920146895026946088/Unshut.png");
-
-                        })
-                           .catch(function(err){
-                          msg.reply("I cant unmute this user, probably their role is higher than mine, sorry );");
-                           })
-                      }
-                      else {
-                        msg.reply("This user are not muted already!")
-                      }
-                    }
+                if (msg.member.permissions.has(["MANAGE_ROLES", "BAN_MEMBERS"])) {
+                  if (membromute == undefined) {
+                    msg.reply("Please ping a valid user")
                   }
                   else {
-                    msg.reply("You need the to be a mod to use this!")
-                  }
+                    if (membromute.roles.cache.some(role => role.name === 'Muted')) {
+                      var role = membromute.guild.roles.cache.find(role => role.name === "Muted");
+                      membromute.roles.remove(role).then(function () {
+                        let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+                        const embedmute = new Discord.MessageEmbed()
+                          .setColor('#0099ff')
+                          .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+                          .setThumbnail("https://cdn.discordapp.com/avatars/" + membromute.id + "/" + membromute.user.avatar + ".png")
+                          .setTitle('Unpunished user:')
+                          .addFields(
+                            { name: 'Nickname', value: nomemute },
+                            { name: 'Cause', value: motivo },
+                          )
+                          .setTimestamp()
+                          .setFooter('The user was unmuted successfully!');
+                        if (c) {
+                          c.send({ embeds: [embedmute] });
+                        }
+                        membromute.send({ content: `You were unmuted on the ${msg.guild.name} server!`, embeds: [embedmute], })
+                          .catch(err => {
+                            console.error(`Error while sending a DM unmute.`);
+                          });
+                        msg.reply("The user was unmuted successfully! ")
+                        msg.channel.send("https://media.discordapp.net/attachments/273509180747415555/920146895026946088/Unshut.png");
 
+                      })
+                        .catch(function (err) {
+                          msg.reply("I cant unmute this user, probably their role is higher than mine, sorry );");
+                        })
+                    }
+                    else {
+                      msg.reply("This user are not muted already!")
+                    }
+                  }
                 }
+                else {
+                  msg.reply("You need the to be a mod to use this!")
+                }
+
               }
 
             })();
@@ -1264,74 +1279,80 @@ client.on("messageCreate", (msg) => {
 
 
 
-if (msg.content.toLocaleLowerCase().startsWith("!timeout")) {
-              var timeoutmember = msg.mentions.members.first();
-              if (timeoutmember == msg.author.id || timeoutmember == process.env.BOTID) {
-                msg.reply("Oof, you can not timeout yourself or me!")
+          if (msg.content.toLocaleLowerCase().startsWith("!timeout")) {
+            var timeoutmember = msg.mentions.members.first();
+            let attachment;
+            let attachments = msg.attachments.first();
+            if (attachments) {
+              attachment = attachments.url
+            }
+            if (timeoutmember == msg.author.id || timeoutmember == process.env.BOTID) {
+              msg.reply("Oof, you can not timeout yourself or me!")
+            }
+            else {
+              const msgArr = msg.content.split(' ');
+              const arg = msgArr.slice(2).filter(val => val !== '')
+              var totaltime = arg.join(' ')
+              var timeoutname = "<@" + timeoutmember + ">";
+              if (!totaltime || isNaN(totaltime)) {
+                totaltime = 5;
+              }
+              if (msg.member.permissions.has(["MANAGE_ROLES", "BAN_MEMBERS"])) {
+                if (timeoutmember == undefined) {
+                  msg.reply("Please ping a valid user")
+                }
+                else {
+                  totaltime = parseInt(totaltime)
+
+                  timeoutmember.timeout(totaltime * 60 * 1000).then(function () {
+                    let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+                    const embedtimeout = new Discord.MessageEmbed()
+                      .setColor('#0099ff')
+                      .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+                      .setThumbnail("https://cdn.discordapp.com/avatars/" + timeoutmember.id + "/" + timeoutmember.user.avatar + ".png")
+                      .setTitle('Punished user:')
+                      .addFields(
+                        { name: 'Nickname', value: timeoutname },
+                        { name: 'Time', value: totaltime.toString() + " mins" },
+                      )
+                      .setTimestamp()
+                      .setFooter('The user received a timeout successfully!');
+                    if (!attachment) {
+                      attachment = "No attached proofs"
+                    }
+                    if (c) {
+                      c.send({ content: "Proofs: " + attachment, embeds: [embedtimeout], })
+                    }
+
+                    timeoutmember.send({ content: `You received a timeout on the ${msg.guild.name} server! proofs: ` + attachment, embeds: [embedtimeout], })
+                      .catch(err => {
+                        console.error('Error while sending a DM timeout.');
+                      });
+
+                    msg.reply("The user <@" + timeoutmember.id + "> received a " + totaltime + " mins timeout successfully! ")
+                    msg.channel.send("https://c.tenor.com/Tp6pUkz1oR8AAAAM/breaks-keyboard.gif")
+                  })
+                    .catch(function (err) {
+                      msg.reply("I cant timeout this user, probably their role is higher than mine, sorry");
+                    })
+                }
               }
               else {
-                const msgArr = msg.content.split(' ');
-                const arg = msgArr.slice(2).filter(val => val !== '')
-                var totaltime = arg.join(' ')
-                var timeoutname = "<@" + timeoutmember + ">";
-                if (!totaltime || isNaN(totaltime)) {
-                  totaltime = 5;
-                }
-                if (msg.member.permissions.has(["MANAGE_ROLES", "BAN_MEMBERS"])) {
-                  if (timeoutmember == undefined) {
-                    msg.reply("Please ping a valid user")
-                  }
-                  else {
-                    totaltime = parseInt(totaltime)
+                msg.reply("You need the to be a mod to use this!")
+              }
 
-                      timeoutmember.timeout(totaltime * 60 * 1000).then(function(){
-                        let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-                        const embedtimeout = new Discord.MessageEmbed()
-                          .setColor('#0099ff')
-                          .setAuthor("Responsible mod: " + msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
-                          .setThumbnail("https://cdn.discordapp.com/avatars/" + timeoutmember.id + "/" + timeoutmember.user.avatar + ".png")
-                          .setTitle('Punished user:')
-                          .addFields(
-                            { name: 'Nickname', value: timeoutname },
-                            { name: 'Time', value: totaltime.toString() + " mins"},
-                          )
-                          .setTimestamp()
-                          .setFooter('The user received a timeout successfully!');
-                       if(c){
-                         c.send({embeds: [embedtimeout], })
-                       }
-                        timeoutmember.send({ content: `You received a timeout on the ${msg.guild.name} server!`, embeds: [embedtimeout], })
-                         .catch(err => {
-                         console.error('Error while sending a DM timeout.');
-                          });
-  
-                        msg.reply("The user <@" + timeoutmember.id + "> received a " + totaltime + " mins timeout successfully! ")
-                        msg.channel.send("https://c.tenor.com/Tp6pUkz1oR8AAAAM/breaks-keyboard.gif")
-                      })   
-                    .catch(function(err){
-                      msg.reply("I cant timeout this user, probably their role is higher than mine, sorry");     
-                     })
-              }
-              }
-                else {
-                  msg.reply("You need the to be a mod to use this!")
-                }
-
-              }
+            }
           }
-
-
-
-
-
-
-
-
 
 
           if (msg.content.toLocaleLowerCase().startsWith("!warn")) {
             (async () => {
               var membrowarn = msg.mentions.members.first();
+              let attachment;
+              let attachments = msg.attachments.first();
+              if (attachments) {
+                attachment = attachments.url
+              }
               if (membrowarn == msg.author.id || membrowarn == process.env.BOTID) {
                 msg.reply("Oof, you can not warn yourself or me!")
               }
@@ -1372,10 +1393,14 @@ if (msg.content.toLocaleLowerCase().startsWith("!timeout")) {
                         )
                         .setTimestamp()
                         .setFooter('The user were warned successfully!');
-                     if(c){
-                       c.send({embeds: [embedwarn], })
-                     }
-                      membrowarn.send({ content: `You were warned on the ${msg.guild.name} server!`, embeds: [embedwarn], })
+                        if (!attachment) {
+                        attachment = "No attached proofs"
+                      }
+                      if (c) {
+                      c.send({content: "Proofs: " + attachment, embeds: [embedwarn], })
+                      }
+                      
+                      membrowarn.send({ content: 'You were warned on the ${msg.guild.name} server! proofs: ' + attachment, embeds: [embedwarn], })
                         .catch(err => {
                           console.error(`Error while sending a DM warn.`);
                         });
@@ -1801,9 +1826,9 @@ if (msg.content.toLocaleLowerCase().startsWith("!timeout")) {
               .setTimestamp()
             msg.react('✅');
             setTimeout(() => msg.delete(), 2500);
-            msg.author.send({content:"You can see all the commands in https://decaffeinatedbot.herokuapp.com/commands", embeds: [embedhelp] })
+            msg.author.send({ content: "You can see all the commands in https://decaffeinatedbot.herokuapp.com/commands", embeds: [embedhelp] })
               .catch(err => {
-                msg.channel.send({content:"You can see all the commands in https://decaffeinatedbot.herokuapp.com/commands", embeds: [embedhelp] });
+                msg.channel.send({ content: "You can see all the commands in https://decaffeinatedbot.herokuapp.com/commands", embeds: [embedhelp] });
               });
 
           }
@@ -1935,11 +1960,11 @@ if (msg.content.toLocaleLowerCase().startsWith("!timeout")) {
           if (msg.content.toLowerCase().startsWith("$eval")) {
             (async () => {
               if (msg.author.id == process.env.OWNERID) {
-                  var result = msg.content.split(" ").slice(1).join(" ");
-                  let evaled = await eval(result)
-                .catch(function(err){
-                  msg.reply("❌ Error! ```" + err + "```");
-                })
+                var result = msg.content.split(" ").slice(1).join(" ");
+                let evaled = await eval(result)
+                  .catch(function (err) {
+                    msg.reply("❌ Error! ```" + err + "```");
+                  })
               } else {
                 msg.reply("❌ only the bot owner can use this!");
                 console.log(msg.author.tag + " on " + msg.guild.name + " tried to use eval command!");
@@ -2268,15 +2293,15 @@ client.on("guildCreate", (guild) => {
       }
     }
 
-    try{
+    try {
       guild.channels.create('bot-logs', {
         type: 'GUILD_TEXT',
-      }).then(function channel(chan){
+      }).then(function channel(chan) {
         chan.send("This channel was generated by decaffeinatedbot, here all the moderation logs will be displayed.")
       })
-      }
-    catch{
-     console.log("error");
+    }
+    catch {
+      console.log("error");
     }
   })();
 
@@ -2285,158 +2310,158 @@ client.on("guildCreate", (guild) => {
 ////////////////////////////////logger lines/////////////////////////////
 
 
-client.on('messageDelete', function(msg, channel){
+client.on('messageDelete', function (msg, channel) {
 
   let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-  if(c && msg.content){
-    try{
-    const embeddelete = new Discord.MessageEmbed()
-    .setColor("#00FFFF")
-    .setTitle('Message deleted in ' + msg.channel.name + " channel")
-    .setAuthor("By " + msg.author.tag, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
-    .addFields(
-      { name: 'Content:', value: msg.content },
-    )
-    .setTimestamp()
-    c.send({ embeds: [embeddelete] })
+  if (c && msg.content) {
+    try {
+      const embeddelete = new Discord.MessageEmbed()
+        .setColor("#00FFFF")
+        .setTitle('Message deleted in ' + msg.channel.name + " channel")
+        .setAuthor("By " + msg.author.tag, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+        .addFields(
+          { name: 'Content:', value: msg.content },
+        )
+        .setTimestamp()
+      c.send({ embeds: [embeddelete] })
     }
-  catch{
-    console.log("error")
+    catch {
+      console.log("error")
+    }
   }
-}
-  });
+});
 
 
-  client.on('messageUpdate', function(msg, newmsg){
+client.on('messageUpdate', function (msg, newmsg) {
 
-    let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-    if(c && msg.content){
-      try{
+  let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+  if (c && msg.content) {
+    try {
       const embededit = new Discord.MessageEmbed()
-      .setColor("#00FFFF")
-      .setTitle('Message edited in ' + msg.channel.name + " channel")
-      .setAuthor("By " + msg.author.tag, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
-      .addFields(
-        { name: 'Old content:', value: msg.content },
-        { name: 'New content:', value: newmsg.content },
-      )
-      .setTimestamp()
+        .setColor("#00FFFF")
+        .setTitle('Message edited in ' + msg.channel.name + " channel")
+        .setAuthor("By " + msg.author.tag, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+        .addFields(
+          { name: 'Old content:', value: msg.content },
+          { name: 'New content:', value: newmsg.content },
+        )
+        .setTimestamp()
       c.send({ embeds: [embededit] })
-      }catch{
-        console.log("error")
-      }
+    } catch {
+      console.log("error")
     }
-    });
+  }
+});
 
-    client.on("guildMemberUpdate", function(memberb4, memberafter){
-      let c = memberafter.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-      if(c){
-      if(memberb4.roles.cache.size > memberafter.roles.cache.size) {
-        const embedrole = new Discord.MessageEmbed()
+client.on("guildMemberUpdate", function (memberb4, memberafter) {
+  let c = memberafter.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+  if (c) {
+    if (memberb4.roles.cache.size > memberafter.roles.cache.size) {
+      const embedrole = new Discord.MessageEmbed()
         .setColor("#00FFFF")
         .setTitle('Role removed from ' + memberafter.user.tag)
         .setTimestamp()
-        memberb4.roles.cache.forEach(role => {
-          if(!memberafter.roles.cache.has(role.id)) {
-            embedrole.addField("Removed role:", role.name);
-            }
-          });
-        c.send({ embeds: [embedrole] })
-      }
-      if(memberb4.roles.cache.size < memberafter.roles.cache.size) {
-        const embedrole = new Discord.MessageEmbed()
+      memberb4.roles.cache.forEach(role => {
+        if (!memberafter.roles.cache.has(role.id)) {
+          embedrole.addField("Removed role:", role.name);
+        }
+      });
+      c.send({ embeds: [embedrole] })
+    }
+    if (memberb4.roles.cache.size < memberafter.roles.cache.size) {
+      const embedrole = new Discord.MessageEmbed()
         .setColor("#00FFFF")
         .setTitle('Role added for ' + memberafter.user.tag)
         .setTimestamp()
-        memberafter.roles.cache.forEach(role => {
-          if(!memberb4.roles.cache.has(role.id)) {
-            embedrole.addField("Added role:", role.name);
-            }
-          });
-        c.send({ embeds: [embedrole] })
-      }
+      memberafter.roles.cache.forEach(role => {
+        if (!memberb4.roles.cache.has(role.id)) {
+          embedrole.addField("Added role:", role.name);
+        }
+      });
+      c.send({ embeds: [embedrole] })
     }
-    });
+  }
+});
 
-  client.on("channelCreate", function(channel){
-    let c = channel.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-    if(c){
- console.log(channel)
-      const embedchannel = new Discord.MessageEmbed()
+client.on("channelCreate", function (channel) {
+  let c = channel.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+  if (c) {
+    console.log(channel)
+    const embedchannel = new Discord.MessageEmbed()
       .setColor("#00FFFF")
       .setTitle('Channel "' + channel.name + '" was created')
       .setTimestamp()
+    c.send({ embeds: [embedchannel] })
+  }
+});
+
+client.on("channelDelete", function (channel) {
+  let c = channel.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+  if (c) {
+    console.log(channel)
+    const embedchannel = new Discord.MessageEmbed()
+      .setColor("#00FFFF")
+      .setTitle('Channel "' + channel.name + '" was deleted')
+      .setTimestamp()
+    c.send({ embeds: [embedchannel] })
+  }
+});
+
+client.on("channelUpdate", function (channel, chan) {
+  let c = channel.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+
+  if (c) {
+    if (channel.name != chan.name) {
+      const embedchannel = new Discord.MessageEmbed()
+        .setColor("#00FFFF")
+        .setTitle('Channel "' + channel.name + '" was edited')
+        .setTimestamp()
+        .addFields(
+          { name: 'Old name:', value: channel.name },
+          { name: 'New name:', value: chan.name },
+        )
       c.send({ embeds: [embedchannel] })
     }
-});
-
-client.on("channelDelete", function(channel){
-  let c = channel.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-  if(c){
-console.log(channel)
-    const embedchannel = new Discord.MessageEmbed()
-    .setColor("#00FFFF")
-    .setTitle('Channel "' + channel.name + '" was deleted')
-    .setTimestamp()
-    c.send({ embeds: [embedchannel] })
   }
 });
 
-client.on("channelUpdate", function(channel, chan){
-  let c = channel.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-
-  if(c){
-   if(channel.name != chan.name){
-    const embedchannel = new Discord.MessageEmbed()
-    .setColor("#00FFFF")
-    .setTitle('Channel "' + channel.name + '" was edited')
-    .setTimestamp()
-    .addFields(
-      { name: 'Old name:', value: channel.name },
-      { name: 'New name:', value: chan.name },
-    )
-    c.send({ embeds: [embedchannel] })
-  }
-}
-});
-
-client.on('inviteCreate', function(newInvite){ 
+client.on('inviteCreate', function (newInvite) {
   let c = newInvite.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-  if(c){
+  if (c) {
     const embedinvite = new Discord.MessageEmbed()
-    .setColor("#00FFFF")
-    .setTitle("Invite generated")
-    .setAuthor("By " + newInvite.inviter.tag, "https://cdn.discordapp.com/avatars/" + newInvite.inviter.id + "/" + newInvite.inviter.avatar + ".png")
-    .setTimestamp()
-    .addFields(
-      { name: 'Invite code', value: newInvite.code },
-    )
+      .setColor("#00FFFF")
+      .setTitle("Invite generated")
+      .setAuthor("By " + newInvite.inviter.tag, "https://cdn.discordapp.com/avatars/" + newInvite.inviter.id + "/" + newInvite.inviter.avatar + ".png")
+      .setTimestamp()
+      .addFields(
+        { name: 'Invite code', value: newInvite.code },
+      )
     c.send({ embeds: [embedinvite] })
-}
+  }
 })
 
-client.on('guildMemberAdd', function(member){
+client.on('guildMemberAdd', function (member) {
   console.log(member)
   let c = member.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-  if(c){
+  if (c) {
     const embedjoin = new Discord.MessageEmbed()
-    .setColor("#00FFFF")
-    .setTitle("User joined")
-    .setAuthor(member.user.tag + " joined the server", "https://cdn.discordapp.com/avatars/" + member.id + "/" + member.user.avatar + ".png")
-    .setTimestamp()
+      .setColor("#00FFFF")
+      .setTitle("User joined")
+      .setAuthor(member.user.tag + " joined the server", "https://cdn.discordapp.com/avatars/" + member.id + "/" + member.user.avatar + ".png")
+      .setTimestamp()
     c.send({ embeds: [embedjoin] })
   }
 })
 
-client.on('guildMemberRemove', function(member){
+client.on('guildMemberRemove', function (member) {
   console.log(member)
   let c = member.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-  if(c){
+  if (c) {
     const embedleft = new Discord.MessageEmbed()
-    .setColor("#00FFFF")
-    .setTitle("User left")
-    .setAuthor(member.user.tag + " left the server", "https://cdn.discordapp.com/avatars/" + member.id + "/" + member.user.avatar + ".png")
-    .setTimestamp()
+      .setColor("#00FFFF")
+      .setTitle("User left")
+      .setAuthor(member.user.tag + " left the server", "https://cdn.discordapp.com/avatars/" + member.id + "/" + member.user.avatar + ".png")
+      .setTimestamp()
     c.send({ embeds: [embedleft] })
   }
 })
