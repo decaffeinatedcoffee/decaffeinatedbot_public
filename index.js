@@ -1400,7 +1400,7 @@ client.on("messageCreate", (msg) => {
                       c.send({content: "Proofs: " + attachment, embeds: [embedwarn], })
                       }
                       
-                      membrowarn.send({ content: 'You were warned on the' + msg.guild.name + 'server! proofs: ' + attachment, embeds: [embedwarn], })
+                      membrowarn.send({ content: 'You were warned on the' + msg.guild.name + ' server! proofs: ' + attachment, embeds: [embedwarn], })
                         .catch(err => {
                           console.error(`Error while sending a DM warn.`);
                         });
