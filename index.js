@@ -1510,9 +1510,17 @@ client.on("messageCreate", (msg) => {
               }
               (async () => {
                 var user = intencao;
+                var marrystatus;
                 var valoruser = await keyv.get(user.id);
                 var xpuser = await keyv.get(msg.guild.id + user + 'xp');
                 var warns = await keyv.get(user + "warns");
+                var marry = await keyv.get(user + "marry");
+                if(marry){
+                  marry = JSON.parse(marry)
+                  marrystatus = "Yes, to " + marry.username
+                }else{
+                  marrystatus = "No"
+                }
                 if (!valoruser) {
                   valoruser = 0;
                 }
@@ -1589,6 +1597,7 @@ client.on("messageCreate", (msg) => {
                     { name: 'Account creation', value: '<t:' + time + '>' },
                     { name: 'Bank Balance', value: Math.round(valoruser.toString()) + " coins" },
                     { name: 'Rank', value: xpuser.toString() + ' XP (level ' + Math.trunc(xpuser / 1000) + ')' },
+                    { name: 'Married', value: marrystatus.toString() },
                     { name: 'Total Warns', value: warns.toString() }
                   )
                   .setTimestamp()
@@ -2296,7 +2305,7 @@ client.on("messageCreate", (msg) => {
                               .setStyle('DANGER'),
                           );
                         let a = await msg.channel.send({ content: "Hello, <@" + user.id + ">, <@" + userauthor.id + "> loves you too much and said that wants to marry you because " + cause[1] + ", Will you accept? you have 30 seconds", components: [yes, no] });
-                        setTimeout(() => a.delete(), 30000)
+                        setTimeout(() => a.delete().then(()=> msg.reply("<@" + user.id + "> ignored you" )), 30000)
                       }
                     }
                   })();
