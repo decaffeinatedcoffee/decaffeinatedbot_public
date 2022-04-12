@@ -2257,71 +2257,77 @@ client.on("messageCreate", (msg) => {
           }
 
 
-          if (msg.content.toLocaleLowerCase().startsWith("!marry")) {
-            var user = msg.mentions.members.first();
-            if (user.id == msg.author.id) {
-              msg.reply('You can not marry yourself!');
-            } else {
-              var cause = msg.content.match(/^(\S+)\s(.*)/)
-              if (cause) {
-                var causeslice = cause.slice(1)
-                if (causeslice[1].match(/^(\S+)\s(.*)/)) {
-                  var cause = causeslice[1].match(/^(\S+)\s(.*)/).slice(1)
-                  var userauthor = msg.author;
+         if (msg.content.toLocaleLowerCase().startsWith("!marry")) {
+    var user = msg.mentions.members.first();
+    if (user) {
+      if(user.id == msg.author.id){
+      msg.reply('You can not marry yourself!');
+      }
+      else {
+      var cause = msg.content.match(/^(\S+)\s(.*)/)
+      if (cause) {
+        var causeslice = cause.slice(1)
+        if (causeslice[1].match(/^(\S+)\s(.*)/)) {
+          var cause = causeslice[1].match(/^(\S+)\s(.*)/).slice(1)
+          var userauthor = msg.author;
 
-                  (async () => {
-                    let userAMarriage = await keyv.get(user.id + "marry");
-                    let userBMarriage = await keyv.get(userauthor.id + "marry");
+          (async () => {
+            let userAMarriage = await keyv.get(user.id + "marry");
+            let userBMarriage = await keyv.get(userauthor.id + "marry");
 
 
-                    if (userAMarriage) {
-                      userAMarriage = JSON.parse(userAMarriage);
-                      if (userAMarriage.id == userauthor.id) {
-                        msg.reply("You are already married to <@" + user.id + ">")
-                      } else {
-                        msg.reply("This user is already married to " + userAMarriage.username)
-                      }
-                    } else {
-                      if (userBMarriage) {
-                        userBMarriage = JSON.parse(userBMarriage);
-                        msg.reply("You are already married to " + userBMarriage.username)
-                      } else {
-                        let nojson = { 'a': "n", "uid": user.id, "aid": msg.author.id, };
-                        let yesjson = { 'a': "y", "uid": user.id, "aid": msg.author.id, };
-                        let usernames = JSON.stringify({ "uname": user.user.username, "aname": msg.author.username });
-                        await keyv.set(msg.author.id + user.id + "marriagetry", usernames)
-                        const yes = new MessageActionRow()
-                          .addComponents(
-                            new MessageButton()
-                              .setCustomId(JSON.stringify(yesjson))
-                              .setLabel('Yes i do')
-                              .setStyle('SUCCESS'),
-                          );
-                        const no = new MessageActionRow()
-                          .addComponents(
-                            new MessageButton()
-                              .setCustomId(JSON.stringify(nojson))
-                              .setLabel("No i don't")
-                              .setStyle('DANGER'),
-                          );
-                        let a = await msg.channel.send({ content: "Hello, <@" + user.id + ">, <@" + userauthor.id + "> loves you too much and said that wants to marry you because " + cause[1] + ", Will you accept? you have 30 seconds", components: [yes, no] });
-                        setTimeout(() => a.delete().then(()=> msg.reply("<@" + user.id + "> ignored you" )), 30000)
-                      }
-                    }
-                  })();
-                }
-                else {
-                  msg.reply("You need to say why do you wanna marry <@" + user.id + ">")
-                }
+            if (userAMarriage) {
+              userAMarriage = JSON.parse(userAMarriage);
+              if (userAMarriage.id == userauthor.id) {
+                msg.reply("You are already married to <@" + user.id + ">")
+              } else {
+                msg.reply("This user is already married to " + userAMarriage.username)
               }
-              else {
-                msg.reply("Invalid usage method, please use !marry [user] [cause]")
+            } else {
+              if (userBMarriage) {
+                userBMarriage = JSON.parse(userBMarriage);
+                msg.reply("You are already married to " + userBMarriage.username)
+              } else {
+                let nojson = { 'a': "n", "uid": user.id, "aid": msg.author.id, };
+                let yesjson = { 'a': "y", "uid": user.id, "aid": msg.author.id, };
+                let usernames = JSON.stringify({ "uname": user.user.username, "aname": msg.author.username });
+                await keyv.set(msg.author.id + user.id + "marriagetry", usernames)
+                const yes = new MessageActionRow()
+                  .addComponents(
+                    new MessageButton()
+                      .setCustomId(JSON.stringify(yesjson))
+                      .setLabel('Yes i do')
+                      .setStyle('SUCCESS'),
+                  );
+                const no = new MessageActionRow()
+                  .addComponents(
+                    new MessageButton()
+                      .setCustomId(JSON.stringify(nojson))
+                      .setLabel("No i don't")
+                      .setStyle('DANGER'),
+                  );
+                let a = await msg.channel.send({ content: "Hello, <@" + user.id + ">, <@" + userauthor.id + "> loves you too much and said that wants to marry you because " + cause[1] + ", Will you accept? you have 30 seconds", components: [yes, no] });
+                setTimeout(async function(){ let c = await keyv.get(msg.author.id + user.id + "marriagetry"); if(c){msg.reply("<@" + user.id + "> ignored you" ); a.delete().then(()=> msg.delete()).catch(()=> console.log("err"))}}, 30000)
               }
             }
-          }
+          })();
+        }
+        else {
+          msg.reply("You need to say why do you wanna marry <@" + user.id + ">")
+        }
+      }
+      else {
+        msg.reply("Invalid usage method, please use !marry [user] [cause]")
+      }
+    }
+}else{
+        msg.reply("Please ping a valid user!")
+    }
+  }
 
           if (msg.content.toLocaleLowerCase().startsWith("!divorce")) {
             var user = msg.mentions.members.first();
+            if(user){
             if (user.id == msg.author.id) {
               msg.reply('You can not divorce yourself!');
             } else {
@@ -2334,8 +2340,8 @@ client.on("messageCreate", (msg) => {
 
                   (async () => {
                     let userAdivorce = await keyv.get(msg.author.id + "marry");
-                    userAdivorce = JSON.parse(userAdivorce)
                     if (userAdivorce) {
+                      userAdivorce = JSON.parse(userAdivorce)
                       if (userAdivorce.id == user.id) {
                         await keyv.delete(user.id + "marry");
                         await keyv.delete(userauthor.id + "marry");
@@ -2343,7 +2349,9 @@ client.on("messageCreate", (msg) => {
                       } else {
                         msg.reply("You are not married to this user")
                       }
-                    }
+                    }else{
+                    msg.reply("You are not married to anyone!");
+                     }
                   })();
                 }
                 else {
@@ -2354,6 +2362,9 @@ client.on("messageCreate", (msg) => {
                 msg.reply("Invalid usage method, please use !divorce [user] [cause]")
               }
             }
+            }else{
+        msg.reply("Please ping a valid user!")
+    }
           }
           ////////////////////
 
@@ -2365,7 +2376,7 @@ client.on("messageCreate", (msg) => {
 
 
 
-})
+}) 
 
 audioPlayer.on(AudioPlayerStatus.Idle, () => {
   if (playing != 0) {
