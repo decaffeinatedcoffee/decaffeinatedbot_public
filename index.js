@@ -121,6 +121,25 @@ function setarhora() {
     var totalsize = presences.length;
     presences.splice(10, totalsize);
   }
+  if(dia == 1 && mes == 4 && horas == 0 && minutos == 0 && segundos == 0){
+    client.user.setAvatar("avatar/apfools.png")
+    client.user.setUsername("caffeinatedbot")
+  }
+  else if(dia == 1 && mes == 9 && horas == 0 && minutos == 0 && segundos == 10){
+    client.user.setAvatar("avatar/september.png")
+  }else if(dia == 15 && mes == 10 && horas == 0 && minutos == 0 && segundos == 10){
+    client.user.setAvatar("avatar/hal.png")
+  }else if(dia == 1 && mes == 12 && horas == 0 && minutos == 0 && segundos == 10){
+    client.user.setAvatar("avatar/avatardec.png")
+  }else if(dia == 1 && mes == 1 && horas == 0 && minutos == 0 && segundos == 0){
+    client.user.setAvatar("avatar/"+ anos +".png")
+  }else if(mes == 4 && dia > 1 && horas == 0 && minutos == 0 && segundos == 10){
+    client.user.setAvatar("avatar/avatar.png")
+    client.user.setUsername("decaffeinatedbot")
+  }else if(mes != 10 && mes != 12 && mes != 1 && mes != 4 && horas == 0 && minutos == 0 && segundos == 10){
+    client.user.setAvatar("avatar/avatar.png")
+    client.user.setUsername("decaffeinatedbot")
+  }
   setTimeout(setarhora, 1000)
 
 }
@@ -142,6 +161,23 @@ client.on("ready", (client) => {
                           |/                          
   `);
   keepBotAlive();
+  
+  if(mes == 4 && dia == 1){
+   client.user.setAvatar("avatar/apfools.png")
+   client.user.setUsername("caffeinatedbot")
+  }
+  else if(mes == 9){
+    client.user.setAvatar("avatar/september.png")
+  }else if(dia >= 15 && mes == 10){
+    client.user.setAvatar("avatar/hal.png")
+  }else if(mes == 12){
+    client.user.setAvatar("avatar/avatardec.png")
+  }else if(dia <= 15 && mes == 1){
+    client.user.setAvatar("avatar/"+ anos +".png")
+  }else{
+    client.user.setAvatar("avatar/avatar.png")
+    client.user.setUsername("decaffeinatedbot")
+  }
   console.log("O bot foi iniciado com sucesso")
   console.log("Verificando latencia...")
   function pingboot() {
