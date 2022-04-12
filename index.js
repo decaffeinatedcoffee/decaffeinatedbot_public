@@ -2689,6 +2689,24 @@ app.get('/favicon', function (req, res) {
   res.sendFile(__dirname + '/public/avatar.png');
 });
 
+app.get('/avatar', function (req, res) {
+  if(mes == 4 && dia == 1){
+   res.sendFile(__dirname + "/avatar/apfools.png")
+  }
+  else if(mes == 9){
+    res.sendFile(__dirname + "/avatar/september.png")
+  }else if(dia >= 15 && mes == 10){
+   res.sendFile(__dirname + "/avatar/hal.png")
+  }else if(mes == 12){
+    res.sendFile(__dirname + "/avatar/avatardec.png")
+  }else if(dia <= 15 && mes == 1){
+    res.sendFile(__dirname + "/avatar/" + anos + ".png")
+  }else{
+     res.sendFile(__dirname + "/avatar/avatar.png")
+  }
+});
+
+
 app.get('/profile', async ({ query }, res) => {
   const { code } = query;
 
