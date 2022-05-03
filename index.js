@@ -7,7 +7,7 @@ var express = require('express');
 var app = express();
 const { ocrSpace } = require('ocr-space-api-wrapper');
 const fetch = require('node-fetch');
-var cors = require('cors');
+var cors = require('cors'); 
 require('dotenv').config();
 app.use(express.json());
 app.use(cors());
@@ -175,8 +175,8 @@ client.on("ready", (client) => {
   }else if(dia <= 15 && mes == 1){
     client.user.setAvatar("avatar/"+ anos +".png")
   }else{
-    client.user.setAvatar("avatar/avatar.png")
-    client.user.setUsername("decaffeinatedbot")
+   // bug to fix client.user.setAvatar("avatar/avatar.png")
+    //  client.user.setUsername("decaffeinatedbot")
   }
   console.log("O bot foi iniciado com sucesso")
   console.log("Verificando latencia...")
@@ -2008,10 +2008,14 @@ client.on("messageCreate", (msg) => {
             (async () => {
               if (msg.author.id == process.env.OWNERID) {
                 var result = msg.content.split(" ").slice(1).join(" ");
-                let evaled = await eval(result)
+                try{
+                eval(result)
                   .catch(function (err) {
                     msg.reply("❌ Error! ```" + err + "```");
                   })
+                }catch{
+                  msg.reply("The code ran successfully")
+                }
               } else {
                 msg.reply("❌ only the bot owner can use this!");
                 console.log(msg.author.tag + " on " + msg.guild.name + " tried to use eval command!");
@@ -2133,7 +2137,7 @@ client.on("messageCreate", (msg) => {
                 { name: "Created at", value: "<t:1637344715>" },
                 { name: "RSS", value: totalRss + "MB" },
                 { name: "Heap", value: usedHeap + "MB/" + totalHeap + "MB used" },
-                { name: "RAM", value: usedram + "MB/" + totalram + "MB used" },
+                { name: "RAM", value: (usedram/1000).toFixed(2) + "GB/" + (totalram/1000).toFixed(2) + "GB used" },
                 { name: "CPU cores", value: cores.toString() },
                 { name: "Model", value: cmodel.toString() },
                 { name: "Clock", value: cspeed.toString() + "MHz" },
