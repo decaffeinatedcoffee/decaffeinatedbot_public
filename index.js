@@ -121,25 +121,28 @@ function setarhora() {
     var totalsize = presences.length;
     presences.splice(10, totalsize);
   }
-  if(dia == 1 && mes == 4 && horas == 0 && minutos == 0 && segundos == 0){
-    client.user.setAvatar("avatar/apfools.png")
-    client.user.setUsername("caffeinatedbot")
-  }
-  else if(dia == 1 && mes == 9 && horas == 0 && minutos == 0 && segundos == 10){
-    client.user.setAvatar("avatar/september.png")
-  }else if(dia == 15 && mes == 10 && horas == 0 && minutos == 0 && segundos == 10){
-    client.user.setAvatar("avatar/hal.png")
-  }else if(dia == 1 && mes == 12 && horas == 0 && minutos == 0 && segundos == 10){
-    client.user.setAvatar("avatar/avatardec.png")
-  }else if(dia == 1 && mes == 1 && horas == 0 && minutos == 0 && segundos == 0){
-    client.user.setAvatar("avatar/"+ anos +".png")
-  }else if(mes == 4 && dia > 1 && horas == 0 && minutos == 0 && segundos == 10){
-    client.user.setAvatar("avatar/avatar.png")
-    client.user.setUsername("decaffeinatedbot")
-  }else if(mes != 10 && mes != 12 && mes != 1 && mes != 4 && horas == 0 && minutos == 0 && segundos == 10){
-    client.user.setAvatar("avatar/avatar.png")
-    client.user.setUsername("decaffeinatedbot")
-  }
+  if(horas == 0 && minutos == 0 && segundos == 0){
+    if(mes == 2 && dia == 14){
+      client.user.setAvatar("avatar/valentines.png")
+     }
+    else if(mes == 4 && dia == 1){
+     if(client.user.username != "caffeinatedbot"){
+      client.user.setUsername("caffeinatedbot")
+    }
+    }
+     else if(dia >= 15 && mes == 10){
+      client.user.setAvatar("avatar/halloween.png")
+    } else if(dia >= 19 && mes == 11){
+      client.user.setAvatar("avatar/bday.png")
+    }else if(mes == 12){
+      client.user.setAvatar("avatar/xmas.png")
+    }else{
+     if(client.user.username != "decaffeinatedbot"){
+       client.user.setUsername("decaffeinatedbot")
+     }
+     client.user.setAvatar("avatar/avatar.png")
+    }
+}
   setTimeout(setarhora, 1000)
 
 }
@@ -161,22 +164,26 @@ client.on("ready", (client) => {
                           |/                          
   `);
   keepBotAlive();
-  
-  if(mes == 4 && dia == 1){
-   client.user.setAvatar("avatar/apfools.png")
-   client.user.setUsername("caffeinatedbot")
+
+  if(mes == 2 && dia == 14){
+    client.user.setAvatar("avatar/valentines.png")
+   }
+  else if(mes == 4 && dia == 1){
+   if(client.user.username != "caffeinatedbot"){
+    client.user.setUsername("caffeinatedbot")
   }
-  else if(mes == 9){
-    client.user.setAvatar("avatar/september.png")
-  }else if(dia >= 15 && mes == 10){
-    client.user.setAvatar("avatar/hal.png")
+  }
+   else if(dia >= 15 && mes == 10){
+    client.user.setAvatar("avatar/halloween.png")
+  } else if(dia >= 19 && mes == 11){
+    client.user.setAvatar("avatar/bday.png")
   }else if(mes == 12){
-    client.user.setAvatar("avatar/avatardec.png")
-  }else if(dia <= 15 && mes == 1){
-    client.user.setAvatar("avatar/"+ anos +".png")
+    client.user.setAvatar("avatar/xmas.png")
   }else{
-   // bug to fix client.user.setAvatar("avatar/avatar.png")
-    //  client.user.setUsername("decaffeinatedbot")
+   if(client.user.username != "decaffeinatedbot"){
+     client.user.setUsername("decaffeinatedbot")
+    } 
+   client.user.setAvatar("avatar/avatar.png")
   }
   console.log("O bot foi iniciado com sucesso")
   console.log("Verificando latencia...")
@@ -2681,8 +2688,8 @@ server.listen(process.env.PORT || 5000, () => {
 ////////////WEB SERVER LINES //////////////////////////////////////
 
 app.get('/', function (req, res) {
-  res.render('index', { totalguilds: client.guilds.cache.size });
-
+  const users = client.users.cache.filter(user => !user.bot);
+  res.render('index', { totalguilds: client.guilds.cache.size, "totalusers": users.size});
 });
 
 app.get('/commands', function (req, res) {
@@ -2694,19 +2701,17 @@ app.get('/favicon', function (req, res) {
 });
 
 app.get('/avatar', function (req, res) {
-  if(mes == 4 && dia == 1){
-   res.sendFile(__dirname + "/avatar/apfools.png")
-  }
-  else if(mes == 9){
-    res.sendFile(__dirname + "/avatar/september.png")
-  }else if(dia >= 15 && mes == 10){
-   res.sendFile(__dirname + "/avatar/hal.png")
+  if(mes == 2 && dia == 14){
+  res.sendFile(__dirname + "/avatar/valentines.png")
+   }
+   else if(dia >= 15 && mes == 10){
+  res.sendFile(__dirname + "/avatar/halloween.png")
+  } else if(dia >= 19 && mes == 11){
+    res.sendFile(__dirname + "/avatar/bday.png")
   }else if(mes == 12){
-    res.sendFile(__dirname + "/avatar/avatardec.png")
-  }else if(dia <= 15 && mes == 1){
-    res.sendFile(__dirname + "/avatar/" + anos + ".png")
+    res.sendFile(__dirname + "/avatar/xmas.png")
   }else{
-     res.sendFile(__dirname + "/avatar/avatar.png")
+    res.sendFile(__dirname + "/avatar/avatar.png")
   }
 });
 
