@@ -1827,7 +1827,12 @@ client.on("messageCreate", (msg) => {
               }
               var user = intencao;
               if (user.user.avatar) {
-                msg.reply("https://cdn.discordapp.com/avatars/" + user.id + "/" + user.user.avatar + ".png?size=2048")
+                const embedaavatar= new Discord.MessageEmbed()
+                .setColor("#b37bdb")
+                .setTitle('Ayo heres the avatar')
+                .setImage("https://cdn.discordapp.com/avatars/" + user.id + "/" + user.user.avatar + ".png?size=2048")
+                .setTimestamp()
+              msg.reply({ embeds: [embedaavatar] });
               }
 
               else {
