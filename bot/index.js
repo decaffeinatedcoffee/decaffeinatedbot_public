@@ -5,6 +5,7 @@ let process = require('process');
 const os = require("os");
 const { ocrSpace } = require('ocr-space-api-wrapper');
 const fetch = require('node-fetch');
+var cp = require('child_process').spawn;
 require('dotenv').config();
 const client = new Discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES", "DIRECT_MESSAGE_TYPING", "GUILD_VOICE_STATES", "GUILD_PRESENCES", "GUILD_MEMBERS", "GUILD_INVITES"], partials: ["CHANNEL", "SEND_TTS_MESSAGES"] });
 const Keyv = require('keyv');
@@ -2106,6 +2107,10 @@ client.on("messageCreate", (msg) => {
             var totalHeap = (process.memoryUsage().heapTotal / (1000 * 1000)).toFixed(2);
             var usedHeap = (process.memoryUsage().heapUsed / (1000 * 1000)).toFixed(2);
             var totalRss = (process.memoryUsage().rss / (1000 * 1000)).toFixed(2);
+            var cpuTemp;
+            var temp = cp('cat', ['/sys/class/thermal/thermal_zone0/temp']);
+            temp.stdout.on('data', function(data) {
+            cpuTemp = parseInt(data);
             var arch = process.arch;
             var totalram = (os.totalmem() / (1000 * 1000)).toFixed(2);
             var cores = os.cpus().length;
@@ -2131,6 +2136,7 @@ client.on("messageCreate", (msg) => {
                 { name: "CPU cores", value: cores.toString() },
                 { name: "Model", value: cmodel.toString() },
                 { name: "Clock", value: cspeed.toString() + "MHz" },
+                { name: "Temperature", value: cpuTemp + "°C" },
                 { name: "Arch", value: arch },
                 { name: "OS", value: osys },
                 { name: "Platform", value: platf },
@@ -2139,6 +2145,7 @@ client.on("messageCreate", (msg) => {
 
               .setTimestamp()
             msg.reply({ embeds: [botinfoEmbed] });
+          });
           }
 
 
