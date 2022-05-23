@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&family=Oswald&display=swap" rel="stylesheet">
+     <link rel="shortcut icon" href="/favicon" type="image/x-icon">
+     <meta property="og:url"                content="https://decaffeinatedbot.herokuapp.com/" />
+    <meta property="og:title"              content="decaffeinatedbot" />
+    <meta property="og:description"        content="Dashboard" />
+    <meta property="og:image"              content="https://decaffeinatedbot.herokuapp.com/avatar" />
+    <title>Your decaffeinatedbot profile</title>
+</head>
+<style>
+body{
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+}
+#avatar{
+     width: 50px;
+     border-radius:50px;
+    }
+    #pfptitle{
+        font-size: 15px; 
+       cursor: pointer;
+       padding-left: 20px;
+    }
+    #user{
+        display: flex;
+        align-items: center;
+        margin-left: 2%;
+    }
+    #itens{
+        text-align: center;
+        font-family: 'Oswald', sans-serif;
+        font-size: 20px;
+    }
+    #hello{
+        text-align: center;
+        font-size: 30px;
+        font-family: 'Oswald', sans-serif;
+    }
+    
+    table, th, td{
+        margin-left: auto;
+        margin-right: auto;
+        overflow-y: scroll;
+        border: 1px solid rgb(190, 190, 190);
+  border-collapse: collapse;
+  overflow: hidden;
+  font-size: 20px;
+    }
+    #buttons{
+        overflow: hidden;
+        display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+    }
+    #buttons a{
+        text-decoration: none;
+        color: white;
+        float: left;
+        text-align: center;
+        padding: 14px 16px;
+    }
+    #bdayinfo{
+        color: white;
+        font-family: 'Oswald', sans-serif;
+        text-align: center;
+        font-size: 19px;
+    }
+</style>
+<body>
+
+    <div id="buttons">
+    
+        <a id="homepageb" href="/">Homepage</a>
+        <a id="commands" href='/commands'>Commands</a>
+        <a href="https://discord.com/api/oauth2/authorize?client_id=911314631526592544&redirect_uri=https%3A%2F%2Fdecaffeinatedbot.herokuapp.com%2Fprofile&response_type=code&scope=identify%20guilds" id="login">My Profile</a>
+    </div>
+    <div id="user">
+    <img src="https://cdn.discordapp.com/avatars/<%-id%>/<%-avatar%>" alt="User Avatar" id="avatar">
+    <p id="pfptitle" onclick="location.replace('/')" title="Go back"><%-username%></p>
+</div>
+
+<div id="userdata">
+    <p id="hello">Hello, <%-username%> <br> your bank balance is <b id="coins"><%-coins%></b> coins</p>
+
+    <div id="bdayinfo">
+        <p>🎂 Your bday:</p>
+         <p id="bday">
+         </p>
+    </div>
+    <br>
+   <div id="itens">
+    
+    <p>Your itens:</p>
+    <p>🍪 Cookies: <%-cookies%></p>
+    <p>🥠 Fortune cookies: <%-fortunecookies%></p>
+    <p>🔒 Padlock: <%-padlocks%>/3</p>
+    <p>🎁 Gifts: <%-gifts%></p>
+   
+   <br>
+   <p>⚠️ Total warns: <%-warns%></p>
+</div>
+   </div>
+</div>
+<div id="infos">
+    <table id="table">
+        <tr>
+          <th>Guild</th>
+          <th>Resp. Mod</th>
+          <th>Cause</th>
+          <th>Time</th>
+        </tr>  
+         </table>
+</div>
+</body>
+
+<script>
+
+    if(!'<%-username%>'){
+        location.replace("/")
+    }
+
+if('<%-coins%>' >= 0){
+    document.getElementById("coins").style.color = "green";
+}else{
+    document.getElementById("coins").style.color = "red";
+}
+
+var bdday = '<%-bdayd%>';
+var bdmonth = '<%-bdaym%>';
+var bdyear = '<%-bdayy%>';
+
+if('<%-bdayd%>' && !'<%-bdayy%>'){
+document.getElementById("bday").innerText = "📅 " + bdday + "/" + bdmonth;
+}else if('<%-bdayd%>' && '<%-bdayy%>'){
+ document.getElementById("bday").innerText = "📅 " + bdday + "/" + bdmonth + "/" + bdyear;
+}else{
+    document.getElementById("bday").innerText = "😔 No bday setted.";
+}
+if( '<%-warns%>' > 0){
+var jsonwarns = [<%-warnsinfo%>];
+for(var i = 0; i < '<%-warns%>'; i++){
+
+         var pagediv = document.getElementById("table");
+         var pagerow = pagediv.insertRow();
+         var server = pagerow.insertCell();
+         var who = pagerow.insertCell();
+         var why = pagerow.insertCell();
+         var when = pagerow.insertCell();
+
+         var newserver = document.createTextNode(jsonwarns[0][i].guild);
+         var newwho = document.createTextNode(jsonwarns[0][i].mod);
+         var newwhy = document.createTextNode(jsonwarns[0][i].cause);
+         var newwhen = document.createTextNode(jsonwarns[0][i].time);
+
+        server.appendChild(newserver);
+        who.appendChild(newwho);
+        why.appendChild(newwhy);
+        when.appendChild(newwhen);
+       
+}
+}
+</script>
+
+</html>

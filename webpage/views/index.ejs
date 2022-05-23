@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&family=Oswald&display=swap" rel="stylesheet">
+     <link rel="shortcut icon" href="/favicon" type="image/x-icon">
+     <meta property="og:url"                content="https://decaffeinatedbot.herokuapp.com/" />
+    <meta property="og:title"              content="decaffeinatedbot" />
+    <meta property="og:description"        content="Dashboard" />
+    <meta property="og:image"              content="https://decaffeinatedbot.herokuapp.com/avatar" />
+ <title>decaffeinatedbot</title>
+</head>
+<style>
+    body{
+        background-color: rgba(0, 0, 0, 0.9);
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        padding: none;
+        margin: 0;
+    }
+    #avatar{
+    width: 50px;
+    height: 50px;
+     border-radius:50px;
+    }
+    #pfptitle{
+        font-size: 15px; 
+       cursor: pointer;
+       padding-left: 20px;
+    }
+    #bot{
+        display: flex;
+        align-items: center;
+        margin-left: 2%;
+    }
+    #about{
+        text-align: center;
+        font-size: 90%;
+    }
+    #invite{
+        background-color: transparent;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        border: 3px solid rgb(23, 155, 179);
+        display: block;
+        margin: 0 auto;
+        height: 60px;
+        width: 100px;
+        font-size: 20px;
+    }
+    #ghub{
+        background-color: transparent;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        border: 3px solid rgb(23, 179, 88);
+        display: block;
+        margin: 0 auto;
+        height: 60px;
+        width: 100px;
+        font-size: 20px;
+    }
+    #invite:hover{
+        border: 3px solid rgb(0, 213, 255);
+    }
+    #ghub:hover{
+        border: 3px solid rgb(62, 245, 138);
+    }
+    #botname{
+        font-size: 30px;
+        text-align: center;
+        font-family: 'Oswald', sans-serif;
+    }
+   #servers{
+    font-size: 97%;
+        text-align: center;
+        font-family: 'Montserrat', sans-serif;
+   }
+    #buttons a{
+        text-decoration: none;
+        color: white;
+        float: left;
+        text-align: center;
+        padding: 14px 16px;
+    }
+    #buttons{
+        overflow: hidden;
+        display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+    }
+#rep:hover{
+    color: rgb(168, 168, 168);
+}
+
+</style>
+<body> 
+    <div id="homepage">
+        <div id="buttons">
+    
+    <a id="homepageb" href="/">Homepage</a>
+    <a id="commands" href='/commands'>Commands</a>
+    <a href="https://discord.com/api/oauth2/authorize?client_id=911314631526592544&redirect_uri=https%3A%2F%2Fdecaffeinatedbot.herokuapp.com%2Fprofile&response_type=code&scope=identify%20guilds" id="login">My Profile</a>
+</div>
+        <div id="bot">
+    <img src="/avatar" alt="Bot Avatar" id="avatar">
+    <p id="pfptitle">decaffeinatedbot</p>
+    
+</div>
+
+<p id="botname">Hi, i'm decaffeinatedbot</p>
+<p id="about">I'm a moderation, economy and fun BOT for discord servers.</p>
+<p id="servers">Do like <b><%-totalusers%></b> people in <b><%-totalguilds%></b> other servers and invite me now!</p>
+<button id="invite" onclick=" window.open('https://discord.com/api/oauth2/authorize?client_id=911314631526592544&permissions=8&scope=bot', '_blank').focus();">Invite me!</button>
+<p style="text-align: center;">OR</p>
+<button id="ghub" onclick="window.open('https://github.com/decaffeinatedcoffee/decaffeinatedbot_public', '_blank').focus();">Go to GitHub</button>
+</div>
+
+
+<div style="position: fixed; left: 50%; bottom: 0px; transform: translate(-40%, -20%); margin: 0 auto;">
+<p style="text-align: center; font-size: 12px;">Lives inside a</p>
+<img src="images/opi.png" style="width: 120px; cursor: pointer;" onclick="window.open('http://www.orangepi.org/', '_blank').focus();">
+</div>
+
+</body>
+
+</html>
