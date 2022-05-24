@@ -14,6 +14,8 @@ const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, createAudioPla
 const audioPlayer = createAudioPlayer();
 const fs = require('fs');
 const ytdl = require("ytdl-core");
+const playdl = require("play-dl")
+const yts = require( 'yt-search' );
 const keyv = new Keyv(process.env.MONGODB);
 const dailySet = new Set();
 const trabalhoSet = new Set();
@@ -27,6 +29,7 @@ var presencasetada;
 var estadoatual;
 var playing = 0;
 var playchannel = 0;
+var jukeboxuser;
 var segundos;
 var horas;
 var minutos;
@@ -34,7 +37,16 @@ var getdate;
 var dia;
 var anos;
 var mes;
+var title
+var channelname
+var views
+var thumbnail
+var likes
+var totalmediatime
+var jukeboxtimer = 0;
 var allowed;
+var currentplayembed;
+
 let resultcookie = [
 
   "won nothing 😢",
@@ -1721,7 +1733,8 @@ client.on("messageCreate", (msg) => {
 
           if (msg.content.startsWith("!jukebox")) {
             (async () => {
-              let file = msg.attachments.first();
+              var videoURL 
+              var videoQuery = msg.content.slice(9);
               var usercoins = await keyv.get(msg.author.id)
               if (!msg.member.voice.channel) {
                 msg.reply("You need to join a voice channel!");
@@ -1733,12 +1746,82 @@ client.on("messageCreate", (msg) => {
 
                     try {
                       await keyv.set(msg.author.id, usercoins.toString() - 150);
-                      if (file.contentType == 'audio/mpeg') {
-                        msg.reply("Allright! You paid 150 coins and the jukebox is now playing **" + file.name.replace('_', ' ') + ".** \r\n Use !leave if you want to stop (No refund). \r\n **Also, by sending files to play you agree you have all the rights to the file.**")
-                        console.log("Playing " + file.name + " in " + msg.guild.name + " guild for " + msg.author.tag)
+                      if(ytdl.validateURL(videoQuery)){
+                        videoURL = videoQuery;
+                      }else{
+                     var result = await yts(videoQuery)
+                     if(result){
+                     videoURL = result.all[0].url;
+                     }else{
+                       msg.reply("I cant find any result for your search")
+                     }
+                      }
+                      if (ytdl.validateURL(videoURL)) {
+                      ytdl.getInfo(videoURL).then(data =>
+                      (title = data.videoDetails.title,
+                      channelname = data.videoDetails.ownerChannelName,
+                      views = data.videoDetails.viewCount,
+                      thumbnail = data.videoDetails.thumbnails[1].url,
+                       totalmediatime = data.videoDetails.lengthSeconds, 
+                      likes = data.videoDetails.likes                                 
+                        )).then(async function(){
+                          var hours = Math.floor(totalmediatime / (60 * 60));
+                          var dm = totalmediatime % (60 * 60);
+                          var minutes = Math.floor(dm / 60);
+                          var ds = dm % 60;
+                          var seconds = Math.ceil(ds);
+                          jukeboxuser = msg.author.id
+                          console.log("Playing" + title + " - " + channelname + " for " + msg.author.tag + " in " + msg.guild.name)
+                          const jukembed = new Discord.MessageEmbed()
+                          .setAuthor(msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+                          .setThumbnail(thumbnail)
+                          .setAuthor(msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")                         
+                          .setTimestamp()
+                          if(hours <= 0){
+                            jukembed.addFields(  
+                              {
+                                 name: "Now playing" ,
+                                 value: title + " - (" + minutes + ":" + seconds + ")",
+                               },
+                            )
+                          }else{
+                            jukembed.addFields(  
+                              {
+                                name: "Now playing" ,
+                                value: title + " - " + hours + ":" + minutes + ":" + seconds,
+                              },
+                            )
+                          }
+                          jukembed.addFields(  
+                            {
+                             name: "By" ,
+                             value: channelname,
+                           },
+                           {
+                             name: "\u200b" ,
+                             value: "👁 " + views + " views",
+                             inline: true,
+                           },
+                           {
+                             name: "\u200b" ,
+                             value: "👍 " + likes + " Likes",
+                             inline: true,
+                           }
+                         )
+                         const leave = new MessageActionRow()
+                  .addComponents(
+                    new MessageButton()
+                      .setCustomId("leavevoice")
+                      .setLabel("Stop")
+                      .setStyle('DANGER'),
+                  );
+                       currentplayembed = await msg.channel.send({ embeds: [jukembed], components: [leave] });
+                       updateStatus();
+                      })
                         playing = msg.guild.id
                         playchannel = msg.channel
-                        let channel = msg.member.voice.channel;
+                        let channel = msg.member.voice.channel;      
+                        var ytstream = await playdl.stream(videoURL)       
                         const connection = joinVoiceChannel({
                           channelId: channel.id,
                           guildId: channel.guild.id,
@@ -1746,25 +1829,25 @@ client.on("messageCreate", (msg) => {
                         });
 
                         conexaoaudio = connection;
-                        connection.subscribe(audioPlayer);
-
-                        const resource = createAudioResource(file.attachment, {
-                          inputType: StreamType.Arbitrary,
+                        connection.subscribe(audioPlayer);               
+                        const resource = createAudioResource(ytstream.stream, {
+                          inputType: ytstream.type,
                           inlineVolume: true,
                           bitrate: 192000
-                        });
-
+                        })
+    
                         audioPlayer.play(resource);
 
 
                       }
 
                       else {
-                        msg.reply("Please send a valid audio file!")
+                        msg.reply("Please enter a valid URL")
                       }
                     }
                     catch {
-                      msg.reply("Please attach the audio file (By sending files to play you agree you have all the rights to the file!)")
+                      currentplayembed.delete();
+                      msg.reply("oh oh an error ocurred")
                     }
 
                   }
@@ -1841,7 +1924,7 @@ client.on("messageCreate", (msg) => {
                 { name: '!botinfo', value: "Show bot infos" },
                 { name: '!dice [amount]', value: "Roll the dice for the chance to win the bet value" },
                 { name: '!steal [user]', value: "Steal a random coins amount from the user" },
-                { name: '!jukebox [attach a audio file]', value: "Pay 150 coins and play a audio file inside the voice channel" },
+                { name: '!jukebox [URL or Title]', value: "Pay 150 coins and play a song from YouTube" },
                 { name: '!ocr [attach a image or PDF]', value: "Sends the text from a image on the chat" },
                 { name: '!random color', value: "Generates a random color name" },
                 { name: '!random number', value: "Generates a random number" },
@@ -2417,14 +2500,101 @@ client.on("messageCreate", (msg) => {
 
 audioPlayer.on(AudioPlayerStatus.Idle, () => {
   if (playing != 0) {
-    const connection = getVoiceConnection(playing)
+    const connection = getVoiceConnection(playing);
     connection.disconnect()
-    playchannel.send("✅ ***The audio was ended, the bot is now Idle!***")
+    currentplayembed.edit({content:"The track has ended", embeds: [], components: []})
     console.log("Left voice channel due to track end");
     playchannel = 0
     playing = 0
   }
 });
+
+
+function updateStatus(){
+if(playchannel != 0){
+jukeboxtimer++
+var user = client.users.cache.get(jukeboxuser);
+var hours = Math.floor(totalmediatime / (60 * 60));
+var dm = totalmediatime % (60 * 60);
+var minutes = Math.floor(dm / 60);
+var ds = dm % 60;
+var seconds = Math.ceil(ds);
+var percentage = (jukeboxtimer * 100) / totalmediatime
+var percent = percentage / 10
+percent = Math.round(percent)
+var hoursd = Math.floor(jukeboxtimer / (60 * 60));
+var dmd = jukeboxtimer % (60 * 60);
+var minutesd = Math.floor(dmd / 60);
+var dsd = dmd % 60;
+var secondsd = Math.ceil(dsd);
+
+const jukembed = new Discord.MessageEmbed()
+.setAuthor(user.username, "https://cdn.discordapp.com/avatars/" + user.id + "/" + user.avatar + ".png")
+.setThumbnail(thumbnail)                     
+.setTimestamp()
+if(hours <= 0){
+  jukembed.addFields(  
+    {
+       name: "Now playing" ,
+       value: title + " - (" + minutes + ":" + seconds + ")",
+     },
+  )
+}else{
+  jukembed.addFields(  
+    {
+      name: "Now playing" ,
+      value: title + " - " + hours + ":" + minutes + ":" + seconds,
+    },
+  )
+}
+jukembed.addFields(  
+  {
+   name: "By" ,
+   value: channelname,
+ },
+ {
+   name: "\u200b" ,
+   value: "👁 " + views + " views",
+   inline: true,
+ },
+ {
+   name: "\u200b" ,
+   value: "👍 " + likes + " Likes",
+   inline: true,
+ }
+)
+if(secondsd < 10){
+  secondsd = "0" + secondsd
+}
+if(seconds < 10){
+  seconds = "0" + seconds
+}
+
+if(hours <= 0){
+  jukembed.addFields(  
+    {
+       name: "Status" ,
+       value: minutesd + ":" + secondsd + " " + statusbar[percent] + " " + minutes + ":" + seconds,
+     },
+  )
+}else{
+  jukembed.addFields(  
+    {
+      name: "Status" ,
+      value: hoursd + ":" + minutesd + ":" + secondsd + " " + statusbar[percent] + " " + hours + ":" + minutes + ":" + seconds,
+    },
+  )
+}
+
+
+currentplayembed.edit({ embeds: [jukembed] });
+setTimeout(updateStatus, 1000);
+}else{
+  jukeboxtimer = 0;
+  jukeboxuser = 0;
+  currentplayembed = "";
+}
+}
 
 
 
@@ -2481,6 +2651,7 @@ client.on("guildDelete", (guild) => {
 
 client.on('interactionCreate', interaction => {
   if (!interaction.isButton()) return;
+  if(interaction.customId != "leavevoice"){
   let json = JSON.parse(interaction.customId);
   let userAMarriage = json.aid;
   let userBMarriage = json.uid;
@@ -2508,7 +2679,25 @@ client.on('interactionCreate', interaction => {
 
     })();
   }
-
+}
+else if(interaction.customId == "leavevoice"){
+  if (playing != 0 && playing == interaction.guild.id) {
+    if(jukeboxuser == interaction.user.id){
+    playing = 0
+    const connection = getVoiceConnection(interaction.guild.id)
+    connection.disconnect()
+    playchannel = 0;
+   currentplayembed.edit({content:"The user stopped the audio", embeds: [], components: []})
+    console.log("Left voice channel due user action");
+  }
+else{
+  interaction.reply({ ephemeral: true, content: "Only the person who added can stop the track"})
+}
+  }
+  else {
+    interaction.reply("Im not on a voice channel on this server!")
+  }
+}
 
 });
 
@@ -3300,3 +3489,19 @@ let clocks = [
   '🕙',
   '🕚'
 ]
+
+let statusbar = [
+  "[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⠀]",
+  "[▮⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⠀]",
+  "[▮▮⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀]",
+  "[▮▮▮⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⠀]",
+  "[▮▮▮▮⠀⠀⠀⠀⠀⠀⠀⠀⠀]",
+  "[▮▮▮▮▮⠀⠀⠀⠀⠀  ⠀] ",
+  "[▮▮▮▮▮▮⠀⠀⠀⠀ ⠀]",
+  "[▮▮▮▮▮▮▮⠀⠀⠀⠀]",
+  "[▮▮▮▮▮▮▮▮  ⠀]",
+  "[▮▮▮▮▮▮▮▮▮⠀]",
+  "[▮▮▮▮▮▮▮▮▮▮]",
+]
+
+
