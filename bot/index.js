@@ -13,6 +13,8 @@ const { compileFunction } = require("vm");
 const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, createAudioPlayer, AudioResource, StreamType, play, getVoiceConnection } = require('@discordjs/voice');
 const audioPlayer = createAudioPlayer();
 const fs = require('fs');
+const express = require('express')
+const app = express()
 const ytdl = require("ytdl-core");
 const playdl = require("play-dl")
 const yts = require( 'yt-search' );
@@ -141,6 +143,7 @@ function setarhora() {
 
 }
 
+app.listen(3000);
 
 client.on("ready", (client) => {
   setarhora();
@@ -214,9 +217,12 @@ client.on("ready", (client) => {
       estadoatual = estados[presencaatual];
       setTimeout(proximapresença, 5000);
     }
-
+     try{
     client.user.setActivity(presencasetada, { type: estadoatual })
+  }catch{
+   console.log("Error setting the presence!")
   }
+}
 })
 
 
@@ -1122,7 +1128,7 @@ client.on("messageCreate", (msg) => {
                 else {
                   const msgArr = msg.content.split(' ');
                   const arg = msgArr.slice(2).filter(val => val !== '')
-                  const motivo = arg.join(' ')
+                  var motivo = arg.join(' ')
                   var nomeban = "<@" + membroban + ">";
                   if (!motivo) {
                     motivo = "No cause setted"
@@ -1736,27 +1742,65 @@ client.on("messageCreate", (msg) => {
               var videoURL 
               var videoQuery = msg.content.slice(9);
               var usercoins = await keyv.get(msg.author.id)
+              var waiter;
               if (!msg.member.voice.channel) {
                 msg.reply("You need to join a voice channel!");
                 return;
               }
               else {
                 if (playing == 0 || playing == msg.guild.id) {
+                  if(playing == msg.guild.id){      
+                    const connection = getVoiceConnection(playing)
+                    connection.disconnect()
+                    playing = 0;
+                    playchannel = 0;
+                  }
                   if (usercoins >= 150) {
 
                     try {
                       await keyv.set(msg.author.id, usercoins.toString() - 150);
+                      const embedsearch = new Discord.MessageEmbed()
                       if(ytdl.validateURL(videoQuery)){
+                        embedsearch.addFields(
+                          {
+                            name: "Good,",
+                            value: "Results found!"
+                          }
+                        )
+                        waiter = await msg.channel.send({embeds: [embedsearch]});
                         videoURL = videoQuery;
                       }else{
+                        embedsearch.addFields(
+                          {
+                            name: "Okay,",
+                            value: "The hamsters are searching this for you, please wait."
+                          }
+                        )
+                     waiter = await msg.channel.send({embeds:[embedsearch]});
                      var result = await yts(videoQuery)
                      if(result){
                      videoURL = result.all[0].url;
+                     embedsearch.addFields(
+                      {
+                        name: "Good,",
+                        value: "Results found!"
+                      }
+                    )
+                     waiter.edit({embeds:  [embedsearch]});
                      }else{
-                       msg.reply("I cant find any result for your search")
+                      embedsearch.setColor("RED");
+                      embedsearch.addFields(
+                        {
+                          name: "Oh oh,",
+                          value: "Hamsters could not find results!"
+                        }
+                      )
+                       waiter.edit({embeds:  [embedsearch]});
                      }
                       }
                       if (ytdl.validateURL(videoURL)) {
+                        jukeboxtimer = 0;
+                        jukeboxuser = 0;
                       ytdl.getInfo(videoURL).then(data =>
                       (title = data.videoDetails.title,
                       channelname = data.videoDetails.ownerChannelName,
@@ -1771,7 +1815,7 @@ client.on("messageCreate", (msg) => {
                           var ds = dm % 60;
                           var seconds = Math.ceil(ds);
                           jukeboxuser = msg.author.id
-                          console.log("Playing" + title + " - " + channelname + " for " + msg.author.tag + " in " + msg.guild.name)
+                          console.log("Playing " + title + " - " + channelname + " for " + msg.author.tag + " in " + msg.guild.name)
                           const jukembed = new Discord.MessageEmbed()
                           .setAuthor(msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
                           .setThumbnail(thumbnail)
@@ -1814,8 +1858,11 @@ client.on("messageCreate", (msg) => {
                       .setCustomId("leavevoice")
                       .setLabel("Stop")
                       .setStyle('DANGER'),
-                  );
-                       currentplayembed = await msg.channel.send({ embeds: [jukembed], components: [leave] });
+                  );   
+                       waiter.delete().catch(function(err){
+                       console.log(err)
+                      })
+                       currentplayembed = await msg.channel.send({embeds: [jukembed], components: [leave] });
                        updateStatus();
                       })
                         playing = msg.guild.id
@@ -1846,8 +1893,7 @@ client.on("messageCreate", (msg) => {
                       }
                     }
                     catch {
-                      currentplayembed.delete();
-                      msg.reply("oh oh an error ocurred")
+                      msg.reply("Oh oh, an error ocurred, please try again.")
                     }
 
                   }
@@ -2172,6 +2218,7 @@ client.on("messageCreate", (msg) => {
 
 
           if (msg.content.toLowerCase() == '!botclock') {
+              var hoursclock = horas;
             if (horas < 10) { horas = "0" + horas }
             if (minutos < 10) { minutos = "0" + minutos }
             if (segundos < 10) { segundos = "0" + segundos }
@@ -2181,8 +2228,36 @@ client.on("messageCreate", (msg) => {
             if (mes < 10) {
               mes = "0" + mes;
             }
-            msg.reply("📆 " + dia + "/" + mes + "/" + anos + " " + clocks[horas] + ' ' + horas + ':' + minutos + ':' + segundos + ' UTC-3');
+            msg.reply("📆 " + dia + "/" + mes + "/" + anos + " " + clocks[hoursclock] + ' ' + horas + ':' + minutos + ':' + segundos + ' UTC-3');
           }
+
+
+        if(msg.content.toLowerCase().startsWith("$announce")){
+          if(msg.author.id == process.env.OWNERID){
+          var message = msg.content.slice(10);
+          client.guilds.cache.forEach((guild) => {
+          var channel = guild.channels.cache.find(chan => chan.name == "bot-logs");
+         if(channel){
+         channel.send(message);
+           }
+           else{
+            console.log("Can't announce here.");
+            guild.channels.create('bot-logs', {
+              type: 'GUILD_TEXT',
+            }).then(function channel(chan) {
+              chan.send("This channel was generated by decaffeinatedbot, here all the moderation logs will be displayed.")
+              chan.send(message)
+              console.log("channel was created")
+            }).catch(function(){
+              console.log("Can't create channels here.")
+            })
+          }
+});   
+ msg.reply("The announcement was sent!")
+          }else{
+            msg.reply("❌ Only the bot owner can use this command!");
+          }
+        }
 
 
 
@@ -2502,7 +2577,12 @@ audioPlayer.on(AudioPlayerStatus.Idle, () => {
   if (playing != 0) {
     const connection = getVoiceConnection(playing);
     connection.disconnect()
-    currentplayembed.edit({content:"The track has ended", embeds: [], components: []})
+    const endembed = new Discord.MessageEmbed()
+    endembed.addFields({
+      name:"End,",
+      value:"the track ended"
+    })
+   currentplayembed.edit({embeds: [endembed], components: []})
     console.log("Left voice channel due to track end");
     playchannel = 0
     playing = 0
@@ -2532,6 +2612,12 @@ const jukembed = new Discord.MessageEmbed()
 .setAuthor(user.username, "https://cdn.discordapp.com/avatars/" + user.id + "/" + user.avatar + ".png")
 .setThumbnail(thumbnail)                     
 .setTimestamp()
+if(minutes < 10){
+  minutes = "0" + minutes
+}
+if(seconds < 10){
+  seconds = "0" + seconds
+}
 if(hours <= 0){
   jukembed.addFields(  
     {
@@ -2566,10 +2652,6 @@ jukembed.addFields(
 if(secondsd < 10){
   secondsd = "0" + secondsd
 }
-if(seconds < 10){
-  seconds = "0" + seconds
-}
-
 if(hours <= 0){
   jukembed.addFields(  
     {
@@ -2578,6 +2660,9 @@ if(hours <= 0){
      },
   )
 }else{
+  if(minutesd < 10){
+    minutesd = "0" + minutesd
+  }
   jukembed.addFields(  
     {
       name: "Status" ,
@@ -2587,7 +2672,10 @@ if(hours <= 0){
 }
 
 
-currentplayembed.edit({ embeds: [jukembed] });
+currentplayembed.edit({ embeds: [jukembed] }).catch(function(){
+  const connection = getVoiceConnection(playing)
+  connection.disconnect()
+})
 setTimeout(updateStatus, 1000);
 }else{
   jukeboxtimer = 0;
@@ -2595,7 +2683,6 @@ setTimeout(updateStatus, 1000);
   currentplayembed = "";
 }
 }
-
 
 
 client.on("guildCreate", (guild) => {
@@ -2684,10 +2771,13 @@ else if(interaction.customId == "leavevoice"){
   if (playing != 0 && playing == interaction.guild.id) {
     if(jukeboxuser == interaction.user.id){
     playing = 0
-    const connection = getVoiceConnection(interaction.guild.id)
-    connection.disconnect()
-    playchannel = 0;
-   currentplayembed.edit({content:"The user stopped the audio", embeds: [], components: []})
+    
+    const endembed = new Discord.MessageEmbed()
+    endembed.addFields({
+      name:"Okay,",
+      value:"the sound stopped"
+    })
+   currentplayembed.edit({embeds: [endembed], components: []})
     console.log("Left voice channel due user action");
   }
 else{
@@ -2713,9 +2803,11 @@ else{
 
 
 client.on('messageDelete', function (msg, channel) {
-
-  let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-  if (c && msg.content) {
+ let c; 
+ if(msg.channel.type != "DM"){
+  c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+}
+  if (c && msg.content && msg.channel.type != "DM") {
     try {
       const embeddelete = new Discord.MessageEmbed()
         .setColor("#00FFFF")
@@ -2735,9 +2827,11 @@ client.on('messageDelete', function (msg, channel) {
 
 
 client.on('messageUpdate', function (msg, newmsg) {
-
-  let c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-  if (c && msg.content) {
+let c;
+if(msg.channel.type != "DM"){
+  c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+  }
+if (c && msg.content && msg.channel.type != "DM") {
     try {
       const embededit = new Discord.MessageEmbed()
         .setColor("#00FFFF")
@@ -2775,7 +2869,7 @@ client.on("guildMemberUpdate", function (memberb4, memberafter) {
         .setColor("#00FFFF")
         .setTitle('Role added for ' + memberafter.user.tag)
         .setTimestamp()
-      memberafter.roles.cache.forEach(role => {
+        memberafter.roles.cache.forEach(role => {
         if (!memberb4.roles.cache.has(role.id)) {
           embedrole.addField("Added role:", role.name);
         }
