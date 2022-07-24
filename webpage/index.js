@@ -31,7 +31,6 @@ app.get('/', function (req, res) {
   })();
 
 });
-
 app.get('/commands', function (req, res) {
   res.sendFile(__dirname + '/public/commands.html');
 });
@@ -74,7 +73,7 @@ app.get('/profile', async ({ query }, res) => {
           client_secret: process.env.CLIENT_SECRET,
           code,
           grant_type: 'authorization_code',
-          redirect_uri: `https://decaffeinatedbot.herokuapp.com/profile`,
+          redirect_uri: `https://frappubot.herokuapp.com/profile`,
           scope: 'identify',
         }),
         headers: {
@@ -153,6 +152,9 @@ app.get('/profile', async ({ query }, res) => {
     res.send('<script>location.replace("/")</script>')
   }
 
+});
+app.get('*', function(req, res){
+  res.sendFile(__dirname + "/public/404.html");
 });
 
 server.listen(process.env.PORT || 5000, () => {
