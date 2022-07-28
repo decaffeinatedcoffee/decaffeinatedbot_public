@@ -7,7 +7,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js > logs.txt 2> err.txt"
+    "start": "node index.js"
   },
   "author": "decaffeinatedcoffee",
   "license": "ISC",
