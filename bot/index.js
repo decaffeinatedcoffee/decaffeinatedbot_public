@@ -119,6 +119,9 @@ function setarhora() {
       client.user.setUsername("Cappu")
     }
     }
+    else if(dia == 6 && mes == 10){
+      client.user.setAvatar("avatar/noodle.png")
+    }
      else if(dia >= 15 && mes == 10){
       client.user.setAvatar("avatar/halloween.png")
     } else if(dia >= 19 && mes == 11){
@@ -172,6 +175,9 @@ client.on("ready", (client) => {
    if(client.user.username != "Cappu"){
     client.user.setUsername("Cappu")
   }
+  }
+  else if(dia == 6 && mes == 10){
+    client.user.setAvatar("avatar/noodle.png")
   }
    else if(dia >= 15 && mes == 10){
     client.user.setAvatar("avatar/halloween.png")
