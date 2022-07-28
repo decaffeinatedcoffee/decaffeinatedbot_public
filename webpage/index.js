@@ -49,6 +49,9 @@ app.get('/avatar', function (req, res) {
   if(mes == 2 && dia == 14){
   res.sendFile(__dirname + "/avatar/valentines.png")
    }
+   else if(dia == 6 && mes == 10){
+    client.user.setAvatar("avatar/noodle.png")
+  }
    else if(dia >= 15 && mes == 10){
   res.sendFile(__dirname + "/avatar/halloween.png")
   } else if(dia >= 19 && mes == 11){
