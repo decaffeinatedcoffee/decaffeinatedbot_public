@@ -115,8 +115,8 @@ function setarhora() {
       client.user.setAvatar("avatar/valentines.png")
      }
     else if(mes == 4 && dia == 1){
-     if(client.user.username != "caffeinatedbot"){
-      client.user.setUsername("caffeinatedbot")
+     if(client.user.username != "Cappu"){
+      client.user.setUsername("Cappu")
     }
     }
      else if(dia >= 15 && mes == 10){
@@ -126,8 +126,8 @@ function setarhora() {
     }else if(mes == 12){
       client.user.setAvatar("avatar/xmas.png")
     }else{
-     if(client.user.username != "frappu"){
-       client.user.setUsername("frappu")
+     if(client.user.username != "Frappu"){
+       client.user.setUsername("Frappu")
      }
      client.user.setAvatar("avatar/avatar.png")
     }
@@ -2863,125 +2863,158 @@ else{
 
 ////////////////////////////////logger lines/////////////////////////////
 
+client.on('messageDelete', async function (msg, channel) {
+  let c; 
+  let logs = await msg.guild.fetchAuditLogs({
+    limit: 1,
+    type: 'MESSAGE_DELETE'
+  });
+  let entry = logs.entries.first();
+  if(msg.channel.type != "DM"){
+    c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+ }
+   if (c && msg.content && msg.channel.type != "DM" && msg.author.id != process.env.BOTID) {
+     try {
+       const embeddelete = new Discord.MessageEmbed()
+         .setColor("#00FFFF")
+         .setTitle('Message deleted from ' + msg.channel.name)
+         .setAuthor("By " + entry.executor.username + "#" + entry.executor.discriminator, "https://cdn.discordapp.com/avatars/" + entry.executor.id + "/" + entry.executor.avatar + ".png")
+         .addFields(
+           { name: 'author:', value: msg.author.tag }, 
+           { name: 'Content:', value: msg.content },
 
-client.on('messageDelete', function (msg, channel) {
- let c; 
+         )
+         .setTimestamp()
+       c.send({ embeds: [embeddelete] })
+     }
+     catch {
+       console.log("error")
+     }
+   }
+ });
+ 
+ 
+ client.on('messageUpdate', async function (msg, newmsg) {
+ let c;
  if(msg.channel.type != "DM"){
   c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-}
-  if (c && msg.content && msg.channel.type != "DM") {
-    try {
-      const embeddelete = new Discord.MessageEmbed()
-        .setColor("#00FFFF")
-        .setTitle('Message deleted in ' + msg.channel.name + " channel")
-        .setAuthor("By " + msg.author.tag, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
-        .addFields(
-          { name: 'Content:', value: msg.content },
-        )
-        .setTimestamp()
-      c.send({ embeds: [embeddelete] })
-    }
-    catch {
-      console.log("error")
-    }
-  }
-});
-
-
-client.on('messageUpdate', function (msg, newmsg) {
-let c;
-if(msg.channel.type != "DM"){
+   }
+ if (c && msg.content != newmsg.content && msg.channel.type != "DM" && msg.author.id != process.env.BOTID) {
+     try {
+       const embededit = new Discord.MessageEmbed()
+         .setColor("#00FFFF")
+         .setTitle('Message edited in ' + msg.channel.name + " channel")
+         .setAuthor("By " + msg.author.tag, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+         .addFields(
+           { name: 'Old content:', value: msg.content },
+           { name: 'New content:', value: newmsg.content },
+         )
+         .setTimestamp()
+       c.send({ embeds: [embededit] })
+     } catch {
+       console.log("error")
+     }
+   }
+ });
+ 
+ client.on("guildMemberUpdate", async function (memberb4, memberafter) {
   c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-  }
-if (c && msg.content && msg.channel.type != "DM") {
-    try {
-      const embededit = new Discord.MessageEmbed()
-        .setColor("#00FFFF")
-        .setTitle('Message edited in ' + msg.channel.name + " channel")
-        .setAuthor("By " + msg.author.tag, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
-        .addFields(
-          { name: 'Old content:', value: msg.content },
-          { name: 'New content:', value: newmsg.content },
-        )
-        .setTimestamp()
-      c.send({ embeds: [embededit] })
-    } catch {
-      console.log("error")
-    }
-  }
-});
-
-client.on("guildMemberUpdate", function (memberb4, memberafter) {
-  let c = memberafter.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-  if (c && memberafter.id != 911314631526592544) {
-    if (memberb4.roles.cache.size > memberafter.roles.cache.size) {
-      const embedrole = new Discord.MessageEmbed()
-        .setColor("#00FFFF")
-        .setTitle('Role removed from ' + memberafter.user.tag)
-        .setTimestamp()
-      memberb4.roles.cache.forEach(role => {
-        if (!memberafter.roles.cache.has(role.id)) {
-          embedrole.addField("Removed role:", role.name);
-        }
-      });
-      c.send({ embeds: [embedrole] })
-    }
-    if (memberb4.roles.cache.size < memberafter.roles.cache.size) {
-      const embedrole = new Discord.MessageEmbed()
-        .setColor("#00FFFF")
-        .setTitle('Role added for ' + memberafter.user.tag)
-        .setTimestamp()
-        memberafter.roles.cache.forEach(role => {
-        if (!memberb4.roles.cache.has(role.id)) {
-          embedrole.addField("Added role:", role.name);
-        }
-      });
-      c.send({ embeds: [embedrole] })
-    }
-  }
-});
-
-client.on("channelCreate", function (channel) {
-  let c = channel.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-  if (c) {
-    
-    const embedchannel = new Discord.MessageEmbed()
+   if (c && memberafter.id != process.env.BOTID) {
+     if (memberb4.roles.cache.size > memberafter.roles.cache.size) {
+      let logs = await memberb4.guild.fetchAuditLogs({type: 25});
+  let entry = logs.entries.first();
+       const embedrole = new Discord.MessageEmbed()
+         .setColor("#00FFFF")
+         .setAuthor("By " + entry.executor.username + "#" + entry.executor.discriminator, "https://cdn.discordapp.com/avatars/" + entry.executor.id + "/" + entry.executor.avatar + ".png")
+         .setTitle('Role removed from ' + memberafter.user.tag)
+         .setTimestamp()
+       memberb4.roles.cache.forEach(role => {
+         if (!memberafter.roles.cache.has(role.id)) {
+           embedrole.addField("Removed role:", role.name);
+         }
+       });
+       c.send({ embeds: [embedrole] })
+     }
+     if (memberb4.roles.cache.size < memberafter.roles.cache.size) {
+      let logs = await memberb4.guild.fetchAuditLogs({type: 25});
+  let entry = logs.entries.first();
+       const embedrole = new Discord.MessageEmbed()
+         .setColor("#00FFFF")
+         .setAuthor("By " + entry.executor.username + "#" + entry.executor.discriminator, "https://cdn.discordapp.com/avatars/" + entry.executor.id + "/" + entry.executor.avatar + ".png")
+         .setTitle('Role added for ' + memberafter.user.tag)
+         .setTimestamp()
+         memberafter.roles.cache.forEach(role => {
+         if (!memberb4.roles.cache.has(role.id)) {
+           embedrole.addField("Added role:", role.name);
+         }
+       });
+       c.send({ embeds: [embedrole] })
+     }
+     if(memberb4.nickname != memberafter.nickname){
+      let logs = await memberb4.guild.fetchAuditLogs({type: 24});
+      let entry = logs.entries.first();
+      const embednick = new Discord.MessageEmbed()
       .setColor("#00FFFF")
-      .setTitle('Channel "' + channel.name + '" was created')
+      .setAuthor("By " + entry.executor.username + "#" + entry.executor.discriminator, "https://cdn.discordapp.com/avatars/" + entry.executor.id + "/" + entry.executor.avatar + ".png")
+      .setTitle('Nick changed for ' + memberafter.user.tag)
       .setTimestamp()
-    c.send({ embeds: [embedchannel] })
-  }
-});
+      .addField("Old name", memberb4.nickname)
+      .addField("New name", memberafter.nickname)
 
-client.on("channelDelete", function (channel) {
-  let c = channel.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-  if (c) {
-    
-    const embedchannel = new Discord.MessageEmbed()
-      .setColor("#00FFFF")
-      .setTitle('Channel "' + channel.name + '" was deleted')
-      .setTimestamp()
-    c.send({ embeds: [embedchannel] })
-  }
-});
-
-client.on("channelUpdate", function (channel, chan) {
-  let c = channel.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
-
-  if (c) {
-    if (channel.name != chan.name) {
-      const embedchannel = new Discord.MessageEmbed()
-        .setColor("#00FFFF")
-        .setTitle('Channel "' + channel.name + '" was edited')
-        .setTimestamp()
-        .addFields(
-          { name: 'Old name:', value: channel.name },
-          { name: 'New name:', value: chan.name },
-        )
-      c.send({ embeds: [embedchannel] })
-    }
-  }
-});
+     c.send({ embeds: [embednick] })
+     }
+   }
+ });
+ 
+ client.on("channelCreate", async function (channel) {
+  c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+  let logs = await channel.guild.fetchAuditLogs({type: 10});
+  let entry = logs.entries.first();
+   if (c) {
+     
+     const embedchannel = new Discord.MessageEmbed()
+       .setColor("#00FFFF")
+       .setAuthor("By " + entry.executor.username + "#" + entry.executor.discriminator, "https://cdn.discordapp.com/avatars/" + entry.executor.id + "/" + entry.executor.avatar + ".png")
+       .setTitle('Channel "' + channel.name + '" was created')
+       .setTimestamp()
+     c.send({ embeds: [embedchannel] })
+   }
+ });
+ 
+ client.on("channelDelete", async function (channel) {
+  c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+   let logs = await channel.guild.fetchAuditLogs({type: 15});
+   let entry = logs.entries.first();
+   if (c) {
+     const embedchannel = new Discord.MessageEmbed()
+       .setColor("#00FFFF")
+       .setAuthor("By " + entry.executor.username + "#" + entry.executor.discriminator, "https://cdn.discordapp.com/avatars/" + entry.executor.id + "/" + entry.executor.avatar + ".png")
+       .setTitle('Channel "' + channel.name + '" was deleted')
+       .setTimestamp()
+     c.send({ embeds: [embedchannel] })
+   }
+ });
+ 
+ client.on("channelUpdate", async function (channel, chan) {
+  c = msg.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
+   let logs = await channel.guild.fetchAuditLogs({type: 11});
+   let entry = logs.entries.first();
+   console.log(entry)
+   if (c) {
+     if (channel.name != chan.name) {
+       const embedchannel = new Discord.MessageEmbed()
+         .setColor("#00FFFF")
+         .setAuthor("By " + entry.executor.username + "#" + entry.executor.discriminator, "https://cdn.discordapp.com/avatars/" + entry.executor.id + "/" + entry.executor.avatar + ".png")
+         .setTitle('Channel "' + channel.name + '" was edited')
+         .setTimestamp()
+         .addFields(
+           { name: 'Old name:', value: channel.name },
+           { name: 'New name:', value: chan.name },
+         )
+       c.send({ embeds: [embedchannel] })
+     }
+   }
+ });
 
 client.on('inviteCreate', function (newInvite) {
   let c = newInvite.guild.channels.cache.find(c => c.name.toLowerCase() === "bot-logs" || c.name.toLowerCase() === "bot_logs");
