@@ -23,6 +23,7 @@ const dailySet = new Set();
 const trabalhoSet = new Set();
 const roubarSet = new Set();
 const clearSet = new Set();
+let leaderboard = new Array()
 const bdaymessage = new Set();
 const xpSet = new Set();
 keyv.on('error', err => console.error('Keyv connection error:', err));
@@ -31,6 +32,7 @@ var presencasetada;
 var estadoatual;
 var playing = 0;
 var playchannel = 0;
+var vchannel = 0;
 var jukeboxuser;
 var segundos;
 var horas;
@@ -48,18 +50,9 @@ var totalmediatime
 var jukeboxtimer = 0;
 var allowed;
 var currentplayembed;
+let coinshakeIcon;
 
 let resultcookie = [
-
-  "won nothing 😢",
-  "won 400 coins 🪙",
-  "won 100 coins 🪙",
-  "it says 'pizza is good 🍕'",
-  "it says 'bread 🍞'",
-  "it says 'don't give up! ❤️'",
-  "it says 'don't let me go! 🥺'",
-  "won 50 coins 🪙",
-  "won 20000 coins 🤑"
 ]
 let cookievalues = [0, 400, 100, 0, 0, 0, 0, 50, 2000]
 
@@ -133,8 +126,8 @@ function setarhora() {
     }else if(mes == 12){
       client.user.setAvatar("avatar/xmas.png")
     }else{
-     if(client.user.username != "decaffeinatedbot"){
-       client.user.setUsername("decaffeinatedbot")
+     if(client.user.username != "frappu"){
+       client.user.setUsername("frappu")
      }
      client.user.setAvatar("avatar/avatar.png")
     }
@@ -160,13 +153,24 @@ client.on("ready", (client) => {
   /_____/_/  |_\____/_/ |_( )  /_____/_____/\____/_/  |_/_/   /_/       
                           |/                          
   `);
-  
+  coinshakeIcon = client.emojis.cache.get("993708375747608586").toString();
+  resultcookie = [
+    "won nothing 😢",
+  "won `400x coinshake`" + coinshakeIcon,
+  "won `100x coinshake`" + coinshakeIcon,
+  "it says 'pizza is good 🍕'",
+  "it says 'bread 🍞'",
+  "it says 'don't give up! ❤️'",
+  "it says 'don't let me go! 🥺'",
+  "won `50x coinshake`" + coinshakeIcon,
+  "won `20000x coinshake` 🤑"
+  ]
   if(mes == 2 && dia == 14){
     client.user.setAvatar("avatar/valentines.png")
    }
   else if(mes == 4 && dia == 1){
-   if(client.user.username != "caffeinatedbot"){
-    client.user.setUsername("caffeinatedbot")
+   if(client.user.username != "Cappu"){
+    client.user.setUsername("Cappu")
   }
   }
    else if(dia >= 15 && mes == 10){
@@ -176,8 +180,8 @@ client.on("ready", (client) => {
   }else if(mes == 12){
     client.user.setAvatar("avatar/xmas.png")
   }else{
-   if(client.user.username != "decaffeinatedbot"){
-     client.user.setUsername("decaffeinatedbot")
+   if(client.user.username != "Frappu"){
+     client.user.setUsername("Frappu")
     } 
    //client.user.setAvatar("avatar/avatar.png")
   }
@@ -216,12 +220,11 @@ client.on("ready", (client) => {
       presencasetada = presences[presencaatual];
       estadoatual = estados[presencaatual];
       setTimeout(proximapresença, 5000);
-    }
-     try{
-    client.user.setActivity(presencasetada, { type: estadoatual })
-  }catch{
-   console.log("Error setting the presence!")
-  }
+    }(async () => {
+    try{
+    await client.user.setActivity(presencasetada, { type: estadoatual })
+}catch{console.log("presence error")}
+})()
 }
 })
 
@@ -267,7 +270,7 @@ client.on("messageCreate", (msg) => {
                 bypass = 1;
               }
               if (hore >= 1 || minre >= 1) {
-                msg.channel.send(`You already have claimed your daily coins, please come back in ` + hore + " hours and " + minre + " minutes.")
+                msg.channel.send(`You already have claimed your daily coinshakes, please come back in ` + hore + " hours and " + minre + " minutes.")
               }
 
               else {
@@ -276,7 +279,7 @@ client.on("messageCreate", (msg) => {
                 var accounttotal = await keyv.get(usuarioperfil);
                 if (accounttotal) {
                   await keyv.set(usuarioperfil, parseInt(accounttotal) + 1000);
-                  msg.reply("You have received 1000 daily coins");
+                  msg.reply("You have received `1000x coinshake`" + coinshakeIcon);
                   dailySet.add(msg.author.id)
                   await keyv.set(msg.author.id + "horadaily", horas)
                   await keyv.set(msg.author.id + "minutodaily", minutos)
@@ -287,7 +290,7 @@ client.on("messageCreate", (msg) => {
                 }
 
                 else {
-                  msg.reply("Sorry, but you need a account to receive the coins, please use !createaccount")
+                  msg.reply("Sorry, but you need a account to receive the daily, please use !createaccount")
                 }
 
               }
@@ -347,7 +350,30 @@ client.on("messageCreate", (msg) => {
             })();
           }
 
-
+          if(msg.content.toLowerCase() == "!leaderboard"){
+            leaderboard = [];
+            (async () => {
+            let messa = await msg.reply("Im generating the leaderboard please wait...");
+            for(member of msg.guild.members.cache){
+              let uxp = await keyv.get(msg.guild.id + member[1].id + "xp");
+              if(uxp){
+              leaderboard.push({user: member[1].user.tag, uxp})
+              }
+            }
+            let xps = [];
+            let usernames = [];
+            leaderboard.sort((a, b) => b.uxp - a.uxp).slice(0, 10).forEach((user) => {xps.push(user.uxp); usernames.push(user.user);})
+            const embedleader = new Discord.MessageEmbed()
+                      .setColor('#0099ff')
+                      .setTitle("Leaderboard")
+                      .setTimestamp()
+              for(var i = 0; i < usernames.length; i++){
+                embedleader.addFields({name: (i +1).toString() + " - " + usernames[i], value: xps[i].toString() + "XP"})
+              }
+              messa.delete();
+              msg.reply({embeds:[embedleader]})
+            })();
+          }
 
           if (msg.content.toLowerCase().startsWith('!setxp')) {
             if (msg.member.permissions.has(["MANAGE_ROLES", "BAN_MEMBERS"])) {
@@ -467,7 +493,7 @@ client.on("messageCreate", (msg) => {
                 if (valoremconta) {
                   await keyv.set(usuarioperfil, parseInt(valoremconta) + salariofinal);
                   await keyv.set(serverusado + "coins", valordoserverwork + lucroserver);
-                  msg.reply("Your worked and earned " + Math.round(salarioaleatorio) + " coins paying " + impostos + "% of server taxes, and your final salary was " + Math.round(salariocortado) + " coins");
+                  msg.reply("Your worked and paid " + impostos + "% of server taxes, `" + Math.round(salariocortado) + "x coinshake`" + coinshakeIcon + " were added to your balance");
                   trabalhoSet.add(msg.author.id)
                   setTimeout(() => {
                     trabalhoSet.delete(msg.author.id)
@@ -475,7 +501,7 @@ client.on("messageCreate", (msg) => {
                   }, 3600000)
                 }
                 else {
-                  msg.reply("Sorry, but you need a acccount to receive the coins, please use !createaccount")
+                  msg.reply("Sorry, but you need a acccount work, please use !createaccount")
                 }
               })();
             }
@@ -540,7 +566,7 @@ client.on("messageCreate", (msg) => {
                   .setColor('#36e36d')
                   .setTitle('Server Bank')
                   .addFields(
-                    { name: 'Balance', value: valorserver + " Coins" },
+                    { name: 'Balance', value: valorserver + " coinshakes" },
 
                   )
                   .setTimestamp()
@@ -566,12 +592,12 @@ client.on("messageCreate", (msg) => {
               .setTitle('Welcome to the decaff store!')
               .setDescription('Look how many cool things we have')
               .addFields(
-                { name: 'Cookie 🍪', value: '250 coins' },
-                { name: 'Fortune Cookie 🥠 (you can earn up to 2k coins)', value: '1500 coins' },
-                { name: 'Gift for your friend 🎁', value: '670 coins' },
-                { name: 'Padlock 🔒', value: '3000 coins' },
-                { name: 'Nothing', value: '10.000 coins' },
-                { name: '!jukebox', value: '150 coins' },
+                { name: 'Cookie 🍪', value: '250 coinshakes' },
+                { name: 'Fortune Cookie 🥠 (you can earn up to 2k coinshakes)', value: '1500 coinshakes' },
+                { name: 'Gift for your friend 🎁', value: '670 coinshakes' },
+                { name: 'Padlock 🔒', value: '3000 coinshakes' },
+                { name: 'Nothing', value: '10.000 coinshakes' },
+                { name: '!jukebox', value: '150 coinshakes' },
               )
               .setTimestamp()
               .setFooter('Use !buy [item name] or [!gift [mention] for the gift');
@@ -603,7 +629,7 @@ client.on("messageCreate", (msg) => {
                   await keyv.set(usuarioperfil, parseInt(valoremconta) - 350);
                   await keyv.set(usuarioperfil + "cookie", cookies + 1);
                   await keyv.set(msg.guild.id + "coins", parseInt(contaserver) + lucroserver + 100);
-                  msg.reply("Yaaaay, you paid 100 coins overdraft fees, use !eat and enjoy your cookie! (and your overdraft fees 😳)");
+                  msg.reply("Yaaaay, you paid 100 coinshakes overdraft fees, use !eat and enjoy your cookie! (and your overdraft fees 😳)");
                 }
               }
               else {
@@ -636,7 +662,7 @@ client.on("messageCreate", (msg) => {
                   await keyv.set(usuarioperfil, parseInt(valoremconta) - 1600);
                   await keyv.set(usuarioperfil + "fortunecookies", fcookies + 1);
                   await keyv.set(msg.guild.id + "coins", parseInt(contaserver) + lucroserver + 100);
-                  msg.reply("YAAAAY, use !open to see your prize! (You paid 100 coins overdraft fees!)");
+                  msg.reply("YAAAAY, use !open to see your prize! (You paid 100 coinshakes overdraft fees!)");
                 }
               }
               else {
@@ -724,7 +750,7 @@ client.on("messageCreate", (msg) => {
                     await keyv.set(usuarioperfil, parseInt(valoremconta) - 770);
                     await keyv.set(msg.guild.id + "coins", parseInt(contaserver) + lucroserver + 100);
                     await keyv.set(prizeuser + "gifts", parseInt(prizes) + 1);
-                    msg.reply("Hey, <@" + prizeuser + ">, <@" + msg.author.id + "> REALLY thinks you are cool and sent you a gift (cuz paid 100 coins overdraft fees to)!❤️")
+                    msg.reply("Hey, <@" + prizeuser + ">, <@" + msg.author.id + "> REALLY thinks you are cool and sent you a gift (cuz paid 100 coinshakes overdraft fees to)!❤️")
                   }
                 }
                 else {
@@ -760,7 +786,7 @@ client.on("messageCreate", (msg) => {
                     await keyv.set(usuarioperfil, parseInt(valoremconta) - 3100);
                     await keyv.set(usuarioperfil + "padlock", lock + 1);
                     await keyv.set(msg.guild.id + "coins", parseInt(contaserver) + lucroserver + 100);
-                    msg.reply("Yaaaay, Now you have a padlock! (and -100 coins fees)");
+                    msg.reply("Yaaaay, Now you have a padlock! (and a negative balance)");
                   }
                 }
               }
@@ -785,7 +811,7 @@ client.on("messageCreate", (msg) => {
                   msg.reply("Yaaaay, you spent 10k successfully");
                 } else {
                   await keyv.set(usuarioperfil, parseInt(valoremconta) - 10100);
-                  msg.reply("Yaaaay, you spent 10.1k overdraft coins successfully");
+                  msg.reply("Yaaaay, you spent 10.1k overdraft coinshakes successfully");
                 }
               }
               else {
@@ -835,8 +861,8 @@ client.on("messageCreate", (msg) => {
 
           }
 
-          if (msg.content.toLocaleLowerCase().startsWith('!money')) {
-            if (msg.content.length <= 7) {
+          if (msg.content.toLocaleLowerCase().startsWith('!balance')) {
+            if (msg.content.length <= 9) {
               var intencao = msg.author;
             }
             else {
@@ -862,7 +888,7 @@ client.on("messageCreate", (msg) => {
                   .setTitle('Bank 🏦')
                   .setDescription("<@" + userdinheros + ">'s account")
                   .addFields(
-                    { name: 'Balance', value: Math.round(valoruser).toString() + " coins" },
+                    { name: 'Balance', value: Math.round(valoruser).toString() + " coinshakes" + coinshakeIcon },
                   )
                   .setTimestamp()
                   .setFooter('You are welcome!');
@@ -955,7 +981,7 @@ client.on("messageCreate", (msg) => {
 
                   if (valorladrao) {
                     if (msg.author.id == user) {
-                      msg.reply("You can not steal yourself... or can you?.....")
+                      msg.reply("You can not steal yourself... or can you?...")
                     }
                     else {
 
@@ -963,7 +989,7 @@ client.on("messageCreate", (msg) => {
                         var padlock = await keyv.get(user + "padlock");
                         if (padlock >= 1) {
                           await keyv.set(user + "padlock", padlock - 1);
-                          msg.reply("eeeeew, <@" + user + "> has a padlock and you was caught! You paid 1k.");
+                          msg.reply("eeeeew, <@" + user + "> has a padlock and you was caught! You paid `1000x coinshake`" + coinshakeIcon);
                           await keyv.set(msg.author.id, parseInt(valorladrao) - 1000);
                           roubarSet.add(msg.author.id)
                           setTimeout(() => {
@@ -974,7 +1000,7 @@ client.on("messageCreate", (msg) => {
                           var valorroubado = Math.floor(Math.random() * valoremcontaroubar);
                           await keyv.set(user, valoremcontaroubar - valorroubado);
                           await keyv.set(msg.author.id, parseInt(valorladrao) + valorroubado);
-                          msg.reply("WOW, u got " + valorroubado + " coins from this user!")
+                          msg.reply("WOW, u got `" + valorroubado + "x coinshake`" +  coinshakeIcon + " from this user!")
                           roubarSet.add(msg.author.id)
                           setTimeout(() => {
                             roubarSet.delete(msg.author.id)
@@ -991,7 +1017,7 @@ client.on("messageCreate", (msg) => {
                     }
                   }
                   else {
-                    msg.reply("Sorry, but you need a acccount to use it!, please use !createaccount")
+                    msg.reply("Sorry, but you need a account to use it!, please use !createaccount")
                   }
                 }
 
@@ -1007,7 +1033,7 @@ client.on("messageCreate", (msg) => {
 
             var paying = msg.mentions.members.first();
             if (paying.id == msg.author.id) {
-              msg.reply('You can not send money from you to yourself');
+              msg.reply('You can not pay from you to yourself');
             } else {
               var amountpre = msg.content.match(/^(\S+)\s(.*)/)
               if (amountpre) {
@@ -1018,7 +1044,7 @@ client.on("messageCreate", (msg) => {
                   if (isNaN(amount[1]) || amount[1] <= 0 || amount[1].toLowerCase().includes("e")) {
                     msg.reply("Please enter a valid value!")
                   } else if (amount[1] > 10000) {
-                    msg.reply("The limit is 10000 coins per transaction");
+                    msg.reply("The limit is 10000 coinshakes per transaction");
                   }
                   else {
                     (async () => {
@@ -1029,7 +1055,7 @@ client.on("messageCreate", (msg) => {
 
                           await keyv.set(paying.id, parseInt(valorpagador) + parseInt(amount[1]))
                           await keyv.set(usuarioperfil, parseInt(valoremconta) - amount[1])
-                          msg.reply("You paid " + amount[1] + " coins to <@" + paying + "> succesfully!")
+                          msg.reply("You paid `" + amount[1] + "x coinshake`" + coinshakeIcon + " to <@" + paying + "> succesfully!")
                         }
                         else {
                           msg.reply("Sorry but this user doesnt have an account!")
@@ -1535,13 +1561,15 @@ client.on("messageCreate", (msg) => {
             }
           }
 
+
+
           if (msg.content.toLocaleLowerCase().startsWith('!about')) {
             if (msg.content.length <= 7) {
-              msg.reply('Please ping a valid user!');
+              var intencao = msg.member;
             }
             else {
               var intencao = msg.mentions.members.first();
-
+            }
               if (intencao == undefined) {
                 msg.reply("Please ping a valid user!")
                 return;
@@ -1587,15 +1615,30 @@ client.on("messageCreate", (msg) => {
                     if (user.presence.activities[0].id == "custom") {
                       var condicao = "";
                       for (var i = 1; i < user.presence.activities.length; i++) {
-                        condicao += user.presence.activities[i].type.toUpperCase().slice(0, 1) + user.presence.activities[i].type.toLowerCase().slice(1) + " " + user.presence.activities[i].name + " - " + user.presence.activities[i].state + " - " + user.presence.activities[i].details + "\r\n"
+                        if(user.presence.activities[i].state != null &&  user.presence.activities[i].details != null){
+                        condicao += user.presence.activities[i].type.toUpperCase().slice(0, 1) + user.presence.activities[i].type.toLowerCase().slice(1) + " " + user.presence.activities[i].name + " - " + user.presence.activities[i].state + " - " + user.presence.activities[i].details + "\r\n\r\n"
+                      }else if(user.presence.activities[i].state != null &&  user.presence.activities[i].details == null){
+                        condicao += user.presence.activities[i].type.toUpperCase().slice(0, 1) + user.presence.activities[i].type.toLowerCase().slice(1) + " " + user.presence.activities[i].name + " - " + user.presence.activities[i].state + "\r\n\r\n"
+                      }else if(user.presence.activities[i].state == null &&  user.presence.activities[i].details != null){
+                        condicao += user.presence.activities[i].type.toUpperCase().slice(0, 1) + user.presence.activities[i].type.toLowerCase().slice(1) + " " + user.presence.activities[i].name + " - " + user.presence.activities[i].details + "\r\n\r\n"
+                      }else if(user.presence.activities[i].state == null &&  user.presence.activities[i].details == null){
+                        condicao += user.presence.activities[i].type.toUpperCase().slice(0, 1) + user.presence.activities[i].type.toLowerCase().slice(1) + " " + user.presence.activities[i].name + "\r\n\r\n"
                       }
+                    }
                       condicao = status + ' with custom status "' + user.presence.activities[0].state + '"' + "\r\n" + condicao;
                     }
                     else {
                       condicao = "";
                       for (var i = 0; i < user.presence.activities.length; i++) {
-                        condicao += user.presence.activities[i].type.toUpperCase().slice(0, 1) + user.presence.activities[i].type.toLowerCase().slice(1) + " " + user.presence.activities[i].name + " - " + user.presence.activities[i].state + " - " + user.presence.activities[i].details + "\r\n"
-                      }
+                        if(user.presence.activities[i].state != null &&  user.presence.activities[i].details != null){
+                          condicao += user.presence.activities[i].type.toUpperCase().slice(0, 1) + user.presence.activities[i].type.toLowerCase().slice(1) + " " + user.presence.activities[i].name + " - " + user.presence.activities[i].state + " - " + user.presence.activities[i].details + "\r\n\r\n"
+                        }else if(user.presence.activities[i].state != null &&  user.presence.activities[i].details == null){
+                          condicao += user.presence.activities[i].type.toUpperCase().slice(0, 1) + user.presence.activities[i].type.toLowerCase().slice(1) + " " + user.presence.activities[i].name + " - " + user.presence.activities[i].state + "\r\n\r\n"
+                        }else if(user.presence.activities[i].state == null &&  user.presence.activities[i].details != null){
+                          condicao += user.presence.activities[i].type.toUpperCase().slice(0, 1) + user.presence.activities[i].type.toLowerCase().slice(1) + " " + user.presence.activities[i].name + " - " + user.presence.activities[i].details + "\r\n\r\n"
+                        }else if(user.presence.activities[i].state == null &&  user.presence.activities[i].details == null){
+                          condicao += user.presence.activities[i].type.toUpperCase().slice(0, 1) + user.presence.activities[i].type.toLowerCase().slice(1) + " " + user.presence.activities[i].name + "\r\n\r\n"
+                        }}
                       condicao = status + "\r\n" + condicao;
                     }
 
@@ -1633,7 +1676,7 @@ client.on("messageCreate", (msg) => {
                     { name: 'Is a bot?', value: isbot },
                     { name: 'Status', value: condicao },
                     { name: 'Account creation', value: '<t:' + time + '>' },
-                    { name: 'Bank Balance', value: Math.round(valoruser.toString()) + " coins" },
+                    { name: 'Bank Balance', value: Math.round(valoruser.toString()) + " coinshakes" + coinshakeIcon },
                     { name: 'Rank', value: xpuser.toString() + ' XP (level ' + Math.trunc(xpuser / 1000) + ')' },
                     { name: 'Married', value: marrystatus.toString() },
                     { name: 'Total Warns', value: warns.toString() }
@@ -1641,7 +1684,6 @@ client.on("messageCreate", (msg) => {
                   .setTimestamp()
                 msg.channel.send({ embeds: [embedabout] });
               })();
-            }
           }
 
 
@@ -1690,11 +1732,11 @@ client.on("messageCreate", (msg) => {
                 msg.reply(hugs[Math.round(hugrandom)])
               }
               else {
-                msg.reply("<@" + msg.author.id + "> just hugged theirself because they love themselves")
+                msg.reply("<@" + msg.author.id + "> just hugged themselve because has self love");
               }
             }
             else {
-              msg.reply("Please ping a valid user!")
+              msg.reply("Please ping a valid user!");
             }
           }
 
@@ -1754,6 +1796,7 @@ client.on("messageCreate", (msg) => {
                     connection.disconnect()
                     playing = 0;
                     playchannel = 0;
+                    vchannel=0;
                   }
                   if (usercoins >= 150) {
 
@@ -1767,7 +1810,7 @@ client.on("messageCreate", (msg) => {
                             value: "Results found!"
                           }
                         )
-                        waiter = await msg.channel.send({embeds: [embedsearch]});
+                        currentplayembed = await msg.channel.send({embeds: [embedsearch]});
                         videoURL = videoQuery;
                       }else{
                         embedsearch.addFields(
@@ -1776,7 +1819,7 @@ client.on("messageCreate", (msg) => {
                             value: "The hamsters are searching this for you, please wait."
                           }
                         )
-                     waiter = await msg.channel.send({embeds:[embedsearch]});
+                     currentplayembed = await msg.channel.send({embeds:[embedsearch]});
                      var result = await yts(videoQuery)
                      if(result){
                      videoURL = result.all[0].url;
@@ -1786,7 +1829,7 @@ client.on("messageCreate", (msg) => {
                         value: "Results found!"
                       }
                     )
-                     waiter.edit({embeds:  [embedsearch]});
+                     currentplayembed.edit({embeds:  [embedsearch]});
                      }else{
                       embedsearch.setColor("RED");
                       embedsearch.addFields(
@@ -1795,7 +1838,7 @@ client.on("messageCreate", (msg) => {
                           value: "Hamsters could not find results!"
                         }
                       )
-                       waiter.edit({embeds:  [embedsearch]});
+                       currentplayembed.edit({embeds:  [embedsearch]});
                      }
                       }
                       if (ytdl.validateURL(videoURL)) {
@@ -1815,6 +1858,9 @@ client.on("messageCreate", (msg) => {
                           var ds = dm % 60;
                           var seconds = Math.ceil(ds);
                           jukeboxuser = msg.author.id
+                          playing = msg.guild.id
+                          playchannel = msg.channel
+                          vchannel = msg.member.voice.channel.id;
                           console.log("Playing " + title + " - " + channelname + " for " + msg.author.tag + " in " + msg.guild.name)
                           const jukembed = new Discord.MessageEmbed()
                           .setAuthor(msg.author.username, "https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
@@ -1840,8 +1886,14 @@ client.on("messageCreate", (msg) => {
                             {
                              name: "By" ,
                              value: channelname,
-                           },
-                           {
+                           })
+                           if(playchannel != 0){
+                           jukembed.addFields(  
+                            {
+                             name: "In" ,
+                             value:":loud_sound: " + client.channels.cache.get(vchannel).name,
+                           })}
+                           jukembed.addFields( {
                              name: "\u200b" ,
                              value: "👁 " + views + " views",
                              inline: true,
@@ -1859,10 +1911,10 @@ client.on("messageCreate", (msg) => {
                       .setLabel("Stop")
                       .setStyle('DANGER'),
                   );   
-                       waiter.delete().catch(function(err){
-                       console.log(err)
-                      })
-                       currentplayembed = await msg.channel.send({embeds: [jukembed], components: [leave] });
+                       //waiter.delete().catch(function(err){
+                       //console.log(err)
+                      //})
+                       currentplayembed.edit({embeds: [jukembed], components: [leave] });
                        updateStatus();
                       })
                         playing = msg.guild.id
@@ -1898,7 +1950,7 @@ client.on("messageCreate", (msg) => {
 
                   }
                   else {
-                    msg.reply("Sorry but you need to have at least 150 coins to use the jukebox!")
+                    msg.reply("Sorry but you need to have at least 150 coinshakes to use the jukebox!")
                   }
                 }
                 else {
@@ -1961,16 +2013,16 @@ client.on("messageCreate", (msg) => {
               .setDescription("Hi " + msg.author.username + ", here are almost all the commands:")
               .addFields(
                 { name: '!createaccount', value: "Creates a account on the bot bank" },
-                { name: '!money', value: "Show the user account balance" },
+                { name: '!balance', value: "Show the user account balance" },
                 { name: '!store', value: "List all the store products" },
-                { name: '!work', value: "Work and give you a random coins value" },
-                { name: '!daily', value: "Gives 1000 daily coins" },
+                { name: '!work', value: "Work and give you a random coinshakes value" },
+                { name: '!daily', value: "Gives 1000 daily coinshakes" },
                 { name: '!pfp [user]', value: "Sends the user PFP" },
                 { name: '!about [user]', value: "Show infos about an user" },
                 { name: '!botinfo', value: "Show bot infos" },
                 { name: '!dice [amount]', value: "Roll the dice for the chance to win the bet value" },
-                { name: '!steal [user]', value: "Steal a random coins amount from the user" },
-                { name: '!jukebox [URL or Title]', value: "Pay 150 coins and play a song from YouTube" },
+                { name: '!steal [user]', value: "Steal a random coinshakes amount from the user" },
+                { name: '!jukebox [URL or Title]', value: "Pay 150 coinshakes and play a song from YouTube" },
                 { name: '!ocr [attach a image or PDF]', value: "Sends the text from a image on the chat" },
                 { name: '!random color', value: "Generates a random color name" },
                 { name: '!random number', value: "Generates a random number" },
@@ -1993,9 +2045,9 @@ client.on("messageCreate", (msg) => {
               .setTimestamp()
             msg.react('✅');
             setTimeout(() => msg.delete(), 2500);
-            msg.author.send({ content: "You can see all the commands in https://decaffeinatedbot.herokuapp.com/commands", embeds: [embedhelp] })
+            msg.author.send({ content: "You can see all the commands in https://frappubot.herokuapp.com/commands", embeds: [embedhelp] })
               .catch(err => {
-                msg.channel.send({ content: "You can see all the commands in https://decaffeinatedbot.herokuapp.com/commands", embeds: [embedhelp] });
+                msg.channel.send({ content: "You can see all the commands in https://frappubot.herokuapp.com/commands", embeds: [embedhelp] });
               });
 
           }
@@ -2049,7 +2101,7 @@ client.on("messageCreate", (msg) => {
 
                   if (accounttotal) {
                     if (accounttotal >= bet) {
-                      msg.channel.send(msg.author.username + " throws the dice for " + bet + " coins")
+                      msg.channel.send(msg.author.username + " throws the dice for `" + bet + "x coinshake`" + coinshakeIcon)
                       var dado1 = Math.round(Math.random() * (6 - 1) + 1)
                       var dado2 = Math.round(Math.random() * (6 - 1) + 1)
                       var dado3 = Math.round(Math.random() * (6 - 1) + 1)
@@ -2062,14 +2114,14 @@ client.on("messageCreate", (msg) => {
                         msg.channel.send(msg.author.username + " have " + dado3 + " and " + dado4)
                         msg.channel.send("The opponent have " + dado1 + " and " + dado2)
                         await keyv.set(msg.author.id, parseInt(accounttotal) - parseInt(bet));
-                        msg.reply(msg.author.username + " lost " + bet + " coins!")
+                        msg.reply(msg.author.username + " lost `" + bet + "x coinshake!`" + coinshakeIcon)
                       } else if (totaloponente == totalplayer) {
                         msg.reply("We tied with " + dado1 + " and " + dado2 + " and no one lost or won")
                       } else if (totalplayer > totaloponente) {
                         msg.channel.send(msg.author.username + " have " + dado3 + " and " + dado4)
                         msg.channel.send("The opponent have " + dado1 + " and " + dado2)
                         await keyv.set(msg.author.id, parseInt(accounttotal) + parseInt(bet));
-                        msg.reply(msg.author.username + " won " + bet + " coins!")
+                        msg.reply(msg.author.username + " won `" + bet + "x coinshake!`" + coinshakeIcon)
                       }
                     }
                     else {
@@ -2245,7 +2297,7 @@ client.on("messageCreate", (msg) => {
             guild.channels.create('bot-logs', {
               type: 'GUILD_TEXT',
             }).then(function channel(chan) {
-              chan.send("This channel was generated by decaffeinatedbot, here all the moderation logs will be displayed.")
+              chan.send("This channel was generated by frappu, here all the moderation logs will be displayed.")
               chan.send(message)
               console.log("channel was created")
             }).catch(function(){
@@ -2261,50 +2313,50 @@ client.on("messageCreate", (msg) => {
 
 
 
-          if (msg.content.toLowerCase() == "!botinfo") {
-            var totalHeap = (process.memoryUsage().heapTotal / (1000 * 1000)).toFixed(2);
-            var usedHeap = (process.memoryUsage().heapUsed / (1000 * 1000)).toFixed(2);
-            var totalRss = (process.memoryUsage().rss / (1000 * 1000)).toFixed(2);
-            var cpuTemp;
-            var temp = cp('cat', ['/sys/class/thermal/thermal_zone0/temp']);
-            temp.stdout.on('data', function(data) {
-            cpuTemp = parseInt(data);
-            var arch = process.arch;
-            var totalram = (os.totalmem() / (1000 * 1000)).toFixed(2);
-            var cores = os.cpus().length;
-            var cmodel = os.cpus()[1].model;
-            var cspeed = os.cpus()[1].speed;
-            var platf = os.platform();
-            var osys = os.version()
-            var usedram = ((os.totalmem() - os.freemem()) / (1000 * 1000)).toFixed(2);
-            const totaluptime = startTimestamp - new Date().valueOf();
-            const totalsecs = Math.floor((totaluptime % (1000 * 60)) / 1000);
-            const totalmins = Math.floor((totaluptime % (1000 * 60 * 60)) / (1000 * 60));
-            const totalhours = Math.floor((totaluptime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const totaldays = Math.floor(totaluptime / (1000 * 60 * 60 * 24));
-            const botinfoEmbed = new Discord.MessageEmbed()
+        if (msg.content.toLowerCase() == "!botinfo") {
+          var totalHeap = (process.memoryUsage().heapTotal / (1000 * 1000)).toFixed(2);
+          var usedHeap = (process.memoryUsage().heapUsed / (1000 * 1000)).toFixed(2);
+          var totalRss = (process.memoryUsage().rss / (1000 * 1000)).toFixed(2);
+          var cpuTemp;
+          var temp = cp('cat', ['/sys/class/thermal/thermal_zone0/temp']);
+          temp.stdout.on('data', function(data) {
+          cpuTemp = parseInt(data);
+          var arch = process.arch;
+          var totalram = (os.totalmem() / (1000 * 1000)).toFixed(2);
+          var cores = os.cpus().length;
+          var cmodel = os.cpus()[1].model;
+          var cspeed = os.cpus()[1].speed;
+          var platf = os.platform();
+          var osys = os.version()
+          var usedram = ((os.totalmem() - os.freemem()) / (1000 * 1000)).toFixed(2);
+          const totaluptime = startTimestamp - new Date().valueOf();
+          const totalsecs = Math.floor((totaluptime % (1000 * 60)) / 1000);
+          const totalmins = Math.floor((totaluptime % (1000 * 60 * 60)) / (1000 * 60));
+          const totalhours = Math.floor((totaluptime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const totaldays = Math.floor(totaluptime / (1000 * 60 * 60 * 24));
+          const botinfoEmbed = new Discord.MessageEmbed()
 
-              .setColor('#79d930')
-              .setDescription("🤖 Heres the bot info")
-              .addFields(
-                { name: "Created at", value: "<t:1637344715>" },
-                { name: "RSS", value: totalRss + "MB" },
-                { name: "Heap", value: usedHeap + "MB/" + totalHeap + "MB used" },
-                { name: "RAM", value: (usedram/1000).toFixed(2) + "GB/" + (totalram/1000).toFixed(2) + "GB used" },
-                { name: "CPU cores", value: cores.toString() },
-                { name: "Model", value: cmodel.toString() },
-                { name: "Clock", value: cspeed.toString() + "MHz" },
-                { name: "Temperature", value: cpuTemp + "°C" },
-                { name: "Arch", value: arch },
-                { name: "OS", value: osys },
-                { name: "Platform", value: platf },
-                { name: "Uptime", value: Math.abs(totaldays + 1) + " days, " + Math.abs(totalhours + 1) + " hours, " + Math.abs(totalmins + 1) + " minutes, " + Math.abs(totalsecs + 1) + " seconds" },
-              )
+            .setColor('#79d930')
+            .setDescription("🤖 Heres the bot info")
+            .addFields(
+              { name: "Created at", value: "<t:1637344715>" },
+              { name: "RSS", value: totalRss + "MB" },
+              { name: "Heap", value: usedHeap + "MB/" + totalHeap + "MB used" },
+              { name: "RAM", value: (usedram/1000).toFixed(2) + "GB/" + (totalram/1000).toFixed(2) + "GB used" },
+              { name: "CPU cores", value: cores.toString() },
+              { name: "Model", value: cmodel.toString() },
+              { name: "Clock", value: cspeed.toString() + "MHz" },
+              { name: "Temperature", value: cpuTemp + "°C" },
+              { name: "Arch", value: arch },
+              { name: "OS", value: osys },
+              { name: "Platform", value: platf },
+              { name: "Uptime", value: Math.abs(totaldays + 1) + " days, " + Math.abs(totalhours + 1) + " hours, " + Math.abs(totalmins + 1) + " minutes, " + Math.abs(totalsecs + 1) + " seconds" },
+            )
 
-              .setTimestamp()
-            msg.reply({ embeds: [botinfoEmbed] });
-          });
-          }
+            .setTimestamp()
+          msg.reply({ embeds: [botinfoEmbed] });
+        });
+        }
 
 
           if (msg.content.toLocaleLowerCase().startsWith("!bday")) {
@@ -2591,8 +2643,8 @@ audioPlayer.on(AudioPlayerStatus.Idle, () => {
 
 
 function updateStatus(){
-if(playchannel != 0){
-jukeboxtimer++
+if(playchannel != 0 && vchannel != 0){
+jukeboxtimer = jukeboxtimer + 5;
 var user = client.users.cache.get(jukeboxuser);
 var hours = Math.floor(totalmediatime / (60 * 60));
 var dm = totalmediatime % (60 * 60);
@@ -2637,8 +2689,15 @@ jukembed.addFields(
   {
    name: "By" ,
    value: channelname,
- },
- {
+ })
+if(playchannel != 0){
+ jukembed.addFields(  
+  {
+   name: "In" , 
+    value:":loud_sound: " + client.channels.cache.get(vchannel).name,
+ })
+}
+jukembed.addFields({
    name: "\u200b" ,
    value: "👁 " + views + " views",
    inline: true,
@@ -2676,7 +2735,7 @@ currentplayembed.edit({ embeds: [jukembed] }).catch(function(){
   const connection = getVoiceConnection(playing)
   connection.disconnect()
 })
-setTimeout(updateStatus, 1000);
+setTimeout(updateStatus, 5000);
 }else{
   jukeboxtimer = 0;
   jukeboxuser = 0;
@@ -2714,7 +2773,7 @@ client.on("guildCreate", (guild) => {
       guild.channels.create('bot-logs', {
         type: 'GUILD_TEXT',
       }).then(function channel(chan) {
-        chan.send("This channel was generated by decaffeinatedbot, here all the moderation logs will be displayed.")
+        chan.send("This channel was generated by frappu, here all the moderation logs will be displayed.")
       })
     }
     catch {
@@ -2771,7 +2830,10 @@ else if(interaction.customId == "leavevoice"){
   if (playing != 0 && playing == interaction.guild.id) {
     if(jukeboxuser == interaction.user.id){
     playing = 0
-    
+    vchannel = 0;
+    playchannel = 0;
+    const connection = getVoiceConnection(interaction.guild.id)
+    connection.disconnect()
     const endembed = new Discord.MessageEmbed()
     endembed.addFields({
       name:"Okay,",
@@ -2962,8 +3024,6 @@ client.on('guildMemberRemove', function (member) {
   }
 })
 /////////////////////////////////////////////////////////////////////////
-
-
 
 client.login(process.env.DISCORDTOKEN);
 
