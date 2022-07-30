@@ -2324,14 +2324,14 @@ client.on("messageCreate", (msg) => {
           var usedHeap = (process.memoryUsage().heapUsed / (1000 * 1000)).toFixed(2);
           var totalRss = (process.memoryUsage().rss / (1000 * 1000)).toFixed(2);
           var cpuTemp;
-          var temp = cp('cat', ['/sys/class/thermal/thermal_zone0/temp']);
+          var temp = cp('cat', ['/sys/class/hwmon/hwmon0/temp2_input']);
           temp.stdout.on('data', function(data) {
           cpuTemp = parseInt(data);
           var arch = process.arch;
           var totalram = (os.totalmem() / (1000 * 1000)).toFixed(2);
           var cores = os.cpus().length;
-          var cmodel = os.cpus()[1].model;
-          var cspeed = os.cpus()[1].speed;
+          var cmodel = os.cpus()[0].model;
+          var cspeed = os.cpus()[0].speed;
           var platf = os.platform();
           var osys = os.version()
           var usedram = ((os.totalmem() - os.freemem()) / (1000 * 1000)).toFixed(2);
@@ -2352,7 +2352,7 @@ client.on("messageCreate", (msg) => {
               { name: "CPU cores", value: cores.toString() },
               { name: "Model", value: cmodel.toString() },
               { name: "Clock", value: cspeed.toString() + "MHz" },
-              { name: "Temperature", value: cpuTemp + "°C" },
+              { name: "Temperature", value: Math.round(cpuTemp / 1000) + "°C" },
               { name: "Arch", value: arch },
               { name: "OS", value: osys },
               { name: "Platform", value: platf },
